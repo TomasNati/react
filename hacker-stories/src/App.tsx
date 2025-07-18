@@ -1,3 +1,5 @@
+import './App.css'
+
 const list = [
   {
     title: 'React',
@@ -17,25 +19,33 @@ const list = [
   }
 ]
 
+const List = () =>  (
+  list.map(({title, url, author, num_comments, points, objectID}) => (
+    <li key={objectID}>
+    <a href={url} target="_blank">{title}</a>
+    <p>Authors: {author}</p>
+    <p>Number of comments: {num_comments}</p>
+    <p>Points: {points}</p>
+    </li> 
+  ))
+)
+
+const Search = () => (
+  <>
+    <label htmlFor="sample">Input: </label>
+    <input type="text" id="sample" />
+  </>
+)
+
 function App() {
 
   return (
-   <div>
+   <div className="app-container">
     <h1>My Hacker Stories</h1>
-    <label htmlFor="sample">Input: </label>
-    <input type="text" id="sample" />
+      <Search />
     <hr />
     <ul>
-      {
-        list.map(({title, url, author, num_comments, points, objectID}) => (
-          <li key={objectID}>
-            <a href={url} target="_blank">{title}</a>
-            <p>Authors: {author}</p>
-            <p>Number of comments: {num_comments}</p>
-            <p>Points: {points}</p>
-          </li>
-        ))
-      }
+      <List />
     </ul>
    </div>
 
