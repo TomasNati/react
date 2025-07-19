@@ -1,3 +1,4 @@
+import type { ChangeEvent , FocusEvent} from 'react'
 import './App.css'
 
 const list = [
@@ -30,26 +31,33 @@ const List = () =>  (
   ))
 )
 
-const Search = () => (
-  <>
-    <label htmlFor="sample">Input: </label>
-    <input type="text" id="sample" />
-  </>
-)
+const Search = () => {
 
-function App() {
+  const onClickHandler = (event: ChangeEvent<HTMLInputElement>) => {
+    console.log(event.target.value)
+  }
+
+  const onBlurHandler = (event: FocusEvent<HTMLInputElement>) => {
+    console.log(event)
+  }
 
   return (
-   <div className="app-container">
-    <h1>My Hacker Stories</h1>
+    <>
+      <label htmlFor="sample">Input: </label>
+      <input type="text" id="sample" onChange={onClickHandler} onBlur={onBlurHandler}/>
+    </>
+  )
+}
+
+const App = () =>  (
+  <div className="app-container">
+    <h1>My Hacker Stories 2</h1>
       <Search />
     <hr />
     <ul>
       <List />
     </ul>
-   </div>
-
-  )
-}
+  </div>
+)
 
 export default App
