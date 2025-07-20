@@ -28,13 +28,12 @@ const List = ({list} : {list: Stories[]}) =>  {
 }
 
 interface SearchProps {
+  searchTerm: string;
   onSearchTermChanged: (term: string) => void
 }
-const Search = ({ onSearchTermChanged } : SearchProps) => {
-  const [searchTerm, setSearchTerm] = useState("")
+const Search = ({ searchTerm, onSearchTermChanged } : SearchProps) => {
 
   const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value)
     onSearchTermChanged(event.target.value)
   }
 
@@ -54,6 +53,7 @@ const Search = ({ onSearchTermChanged } : SearchProps) => {
 }
 
 const App = () =>  {
+  const [searchTerm, setSearchTerm] = useState("")
   const stories: Stories[] =  [
     {
       title: 'React',
@@ -74,18 +74,20 @@ const App = () =>  {
   ]
 
   console.log('App renders')
+
+  const filteredStories = stories.filter(({title}) => title.toLowerCase().includes(searchTerm.toLowerCase()))
   
   const handleSearchTermChanged = (newTerm: string) => {
-    console.log('New Search Term:', newTerm)
+    setSearchTerm(newTerm)
   }
 
   return (
     <div className="app-container">
       <h1>My Hacker Stories 2</h1>
-        <Search onSearchTermChanged={handleSearchTermChanged} />
+        <Search searchTerm={searchTerm} onSearchTermChanged={handleSearchTermChanged} />
       <hr />
       <ul>
-        <List list={stories} />
+        <List list={filteredStories} />
       </ul>
     </div>
   )
