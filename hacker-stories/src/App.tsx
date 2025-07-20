@@ -27,11 +27,15 @@ const List = ({list} : {list: Stories[]}) =>  {
   return list.map((item) => <ItemList key={item.objectID} item={item} /> )
 }
 
-const Search = () => {
+interface SearchProps {
+  onSearchTermChanged: (term: string) => void
+}
+const Search = ({ onSearchTermChanged } : SearchProps) => {
   const [searchTerm, setSearchTerm] = useState("")
 
   const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value)
+    onSearchTermChanged(event.target.value)
   }
 
   const onBlurHandler = (event: FocusEvent<HTMLInputElement>) => {
@@ -70,11 +74,15 @@ const App = () =>  {
   ]
 
   console.log('App renders')
+  
+  const handleSearchTermChanged = (newTerm: string) => {
+    console.log('New Search Term:', newTerm)
+  }
 
   return (
     <div className="app-container">
       <h1>My Hacker Stories 2</h1>
-        <Search />
+        <Search onSearchTermChanged={handleSearchTermChanged} />
       <hr />
       <ul>
         <List list={stories} />
