@@ -46,14 +46,14 @@ const Search = ({ searchTerm, onSearchTermChanged } : SearchProps) => {
   return (
     <>
       <label htmlFor="sample">Input: </label>
-      <input type="text" id="sample" onChange={onChangeHandler} onBlur={onBlurHandler}/>
+      <input type="text" id="sample" value={searchTerm} onChange={onChangeHandler} onBlur={onBlurHandler}/>
       <p>Entered search term: {searchTerm}</p>
     </>
   )
 }
 
 const App = () =>  {
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchTerm, setSearchTerm] = useState("React")
   const stories: Stories[] =  [
     {
       title: 'React',
