@@ -10,21 +10,32 @@ interface Stories {
   objectID: number;
 }
 
-const ItemList = ({item} : {item: Stories}) => {
-  console.log(`Item with ID ${item.objectID} renders`)
+interface ItemListProps {
+  url: string;
+  title: string;
+  author: string;
+  num_comments: number;
+  points: number
+}
+
+const ItemList = ({ url, title, author, num_comments, points } : ItemListProps) => {
+  console.log(`Item with url ${url} renders`)
   return (
     <li>
-      <a href={item.url} target="_blank">{item.title}</a>
-      <p>Authors: {item.author}</p>
-      <p>Number of comments: {item.num_comments}</p>
-      <p>Points: {item.points}</p>
+      <a href={url} target="_blank">{title}</a>
+      <p>Authors: {author}</p>
+      <p>Number of comments: {num_comments}</p>
+      <p>Points: {points}</p>
   </li> 
   )
 }
 
 const List = ({list} : {list: Stories[]}) =>  {
   console.log('List renders')
-  return list.map((item) => <ItemList key={item.objectID} item={item} /> )
+  // rest operator on the left, {objectID,...item}, destructure objectID current element in the list, 
+  //   assigning the rest of the properties to a new object, 'item'.
+  // spread operator on the right, ...item, creates key=value pairs for each operator in item object
+  return list.map(({objectID, ...item}) => <ItemList key={objectID} {...item} /> )
 }
 
 interface SearchProps {
