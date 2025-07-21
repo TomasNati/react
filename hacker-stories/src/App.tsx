@@ -1,5 +1,7 @@
-import { useState, type ChangeEvent , type FocusEvent} from 'react'
+import { useState, type ChangeEvent , type FocusEvent, useEffect} from 'react'
 import './App.css'
+
+const searchKey = 'search';
 
 interface Stories {
   title: string;
@@ -64,7 +66,13 @@ const Search = ({ searchTerm, onSearchTermChanged } : SearchProps) => {
 }
 
 const App = () =>  {
-  const [searchTerm, setSearchTerm] = useState("React")
+  const [searchTerm, setSearchTerm] = useState(localStorage.getItem(searchKey) || "React")
+
+  useEffect(() => {
+    console.log(`%cSearch term changed to: ${searchTerm}`, 'font-weight: bold; color: green;')
+    localStorage.setItem(searchKey, searchTerm)
+  }, [searchTerm])
+
   const stories: Stories[] =  [
     {
       title: 'React',
