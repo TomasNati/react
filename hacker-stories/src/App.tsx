@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent , type FocusEvent, useEffect, type Dispatch, type SetStateAction} from 'react'
+import { useState, type ChangeEvent , type FocusEvent, useEffect, type Dispatch, type SetStateAction, type HTMLInputTypeAttribute} from 'react'
 import './App.css'
 
 const searchKey = 'search';
@@ -54,27 +54,30 @@ const List = ({list} : {list: Stories[]}) =>  {
   return list.map(({objectID, ...item}) => <ItemList key={objectID} {...item} /> )
 }
 
-interface SearchProps {
-  searchTerm: string;
-  onSearchTermChanged: (term: string) => void
+interface InputWithLabelProps {
+  value: string;
+  id: string;
+  label: string;
+  type?: HTMLInputTypeAttribute | undefined;
+  onValueChanged: (term: string) => void
 }
-const Search = ({ searchTerm, onSearchTermChanged } : SearchProps) => {
+const InputWithLabel = ({ id, value, label, type, onValueChanged } : InputWithLabelProps) => {
 
   const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
-    onSearchTermChanged(event.target.value)
+    onValueChanged(event.target.value)
   }
 
   const onBlurHandler = (event: FocusEvent<HTMLInputElement>) => {
     console.log(event)
   }
 
-  console.log('Search renders')
+  console.log('InputWithLabel renders')
 
   return (
     <>
-      <label htmlFor="sample">Input: </label>
-      <input type="text" id="sample" value={searchTerm} onChange={onChangeHandler} onBlur={onBlurHandler}/>
-      <p>Entered search term: {searchTerm}</p>
+      <label htmlFor={id}>{label}: </label>
+      <input type={type || 'text'} id={id} value={value} onChange={onChangeHandler} onBlur={onBlurHandler}/>
+      <p>Entered value: {value}</p>
     </>
   )
 }
@@ -112,7 +115,13 @@ const App = () =>  {
   return (
     <div className="app-container">
       <h1>My Hacker Stories 2</h1>
-        <Search searchTerm={searchTerm} onSearchTermChanged={handleSearchTermChanged} />
+        <InputWithLabel 
+            id="search-term" 
+            value={searchTerm}
+            type='text' 
+            label='Search Term' 
+            onValueChanged={handleSearchTermChanged} 
+        />
       <hr />
       <ul>
         <List list={filteredStories} />
