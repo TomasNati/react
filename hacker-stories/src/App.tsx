@@ -1,7 +1,21 @@
-import { useState, type ChangeEvent , type FocusEvent, useEffect} from 'react'
+import { useState, type ChangeEvent , type FocusEvent, useEffect, type Dispatch, type SetStateAction} from 'react'
 import './App.css'
 
 const searchKey = 'search';
+
+type StorageValueType =  string;
+
+const useStorageState = (key: string, initialValue: StorageValueType): 
+    [StorageValueType, Dispatch<SetStateAction<StorageValueType>>] => {
+    const [value, setValue] = useState<StorageValueType>(localStorage.getItem(key) || initialValue)
+
+    useEffect(() => {
+        localStorage.setItem(key, value)
+        console.log(`%cuseStorageState changed to: ${value}`, 'font-weight: bold; color: green;')
+    }, [value, key])
+
+    return [value, setValue]
+}
 
 interface Stories {
   title: string;
@@ -66,12 +80,7 @@ const Search = ({ searchTerm, onSearchTermChanged } : SearchProps) => {
 }
 
 const App = () =>  {
-  const [searchTerm, setSearchTerm] = useState(localStorage.getItem(searchKey) || "React")
-
-  useEffect(() => {
-    console.log(`%cSearch term changed to: ${searchTerm}`, 'font-weight: bold; color: green;')
-    localStorage.setItem(searchKey, searchTerm)
-  }, [searchTerm])
+  const [searchTerm, setSearchTerm] = useStorageState(searchKey, "React")
 
   const stories: Stories[] =  [
     {
