@@ -57,11 +57,11 @@ const List = ({list} : {list: Stories[]}) =>  {
 interface InputWithLabelProps {
   value: string;
   id: string;
-  label: string;
   type?: HTMLInputTypeAttribute | undefined;
   onValueChanged: (term: string) => void
+  children?: React.ReactNode;
 }
-const InputWithLabel = ({ id, value, label, type, onValueChanged } : InputWithLabelProps) => {
+const InputWithLabel = ({ id, value, type, onValueChanged, children } : InputWithLabelProps) => {
 
   const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
     onValueChanged(event.target.value)
@@ -75,7 +75,7 @@ const InputWithLabel = ({ id, value, label, type, onValueChanged } : InputWithLa
 
   return (
     <>
-      <label htmlFor={id}>{label}: </label>
+      <label htmlFor={id}>{children} </label>
       <input type={type || 'text'} id={id} value={value} onChange={onChangeHandler} onBlur={onBlurHandler}/>
       <p>Entered value: {value}</p>
     </>
@@ -115,13 +115,14 @@ const App = () =>  {
   return (
     <div className="app-container">
       <h1>My Hacker Stories 2</h1>
-        <InputWithLabel 
+      <InputWithLabel 
             id="search-term" 
             value={searchTerm}
             type='text' 
-            label='Search Term' 
             onValueChanged={handleSearchTermChanged} 
-        />
+        >
+            <strong>Search Term:</strong>
+      </InputWithLabel>
       <hr />
       <ul>
         <List list={filteredStories} />
