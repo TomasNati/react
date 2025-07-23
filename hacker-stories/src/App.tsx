@@ -58,10 +58,11 @@ interface InputWithLabelProps {
   value: string;
   id: string;
   type?: HTMLInputTypeAttribute | undefined;
+  autofocus?: boolean;
   onValueChanged: (term: string) => void
   children?: React.ReactNode;
 }
-const InputWithLabel = ({ id, value, type, onValueChanged, children } : InputWithLabelProps) => {
+const InputWithLabel = ({ id, value, type, onValueChanged, children, autofocus }: InputWithLabelProps) => {
 
   const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
     onValueChanged(event.target.value)
@@ -76,7 +77,13 @@ const InputWithLabel = ({ id, value, type, onValueChanged, children } : InputWit
   return (
     <>
       <label htmlFor={id}>{children} </label>
-      <input type={type || 'text'} id={id} value={value} onChange={onChangeHandler} onBlur={onBlurHandler}/>
+      <input 
+        type={type || 'text'} 
+        id={id} value={value} 
+        onChange={onChangeHandler} 
+        onBlur={onBlurHandler} 
+        autoFocus={autofocus}   
+      />
       <p>Entered value: {value}</p>
     </>
   )
@@ -120,6 +127,7 @@ const App = () =>  {
             value={searchTerm}
             type='text' 
             onValueChanged={handleSearchTermChanged} 
+            autofocus
         >
             <strong>Search Term:</strong>
       </InputWithLabel>
