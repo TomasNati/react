@@ -1,4 +1,12 @@
-import { useState, type ChangeEvent , type FocusEvent, useEffect, type Dispatch, type SetStateAction, type HTMLInputTypeAttribute, useRef} from 'react'
+import { useState, 
+    type ChangeEvent, 
+    type FocusEvent, 
+    useEffect, 
+    type Dispatch, 
+    type SetStateAction, 
+    type HTMLInputTypeAttribute, 
+    useRef
+} from 'react'
 import './App.css'
 
 const searchKey = 'search';
@@ -31,10 +39,11 @@ interface ItemListProps {
   title: string;
   author: string;
   num_comments: number;
-  points: number
+  points: number;
+  onRemoveClicked: () => void;
 }
 
-const ItemList = ({ url, title, author, num_comments, points } : ItemListProps) => {
+const ItemList = ({ url, title, author, num_comments, points, onRemoveClicked } : ItemListProps) => {
   console.log(`Item with url ${url} renders`)
   return (
     <li>
@@ -42,16 +51,25 @@ const ItemList = ({ url, title, author, num_comments, points } : ItemListProps) 
       <p>Authors: {author}</p>
       <p>Number of comments: {num_comments}</p>
       <p>Points: {points}</p>
-  </li> 
+      <button type="button" onClick={onRemoveClicked}>Remove</button>
+      <br />
+      <br />
+    </li>
   )
 }
 
-const List = ({list} : {list: Stories[]}) =>  {
+const List = ({list, onRemoveClicked} : {list: Stories[], onRemoveClicked: (objectID: number) => void}) =>  {
   console.log('List renders')
   // rest operator on the left, {objectID,...item}, destructure objectID current element in the list, 
   //   assigning the rest of the properties to a new object, 'item'.
   // spread operator on the right, ...item, creates key=value pairs for each operator in item object
-  return list.map(({objectID, ...item}) => <ItemList key={objectID} {...item} /> )
+  return list.map(({objectID, ...item}) => (
+    <ItemList 
+        key={objectID} 
+        onRemoveClicked={() => onRemoveClicked(objectID)}
+        {...item}  
+    /> 
+  ))
 }
 
 interface InputWithLabelProps {
@@ -101,8 +119,7 @@ const InputWithLabel = ({ id, value, type, onValueChanged, children, autofocus }
 
 const App = () =>  {
   const [searchTerm, setSearchTerm] = useStorageState(searchKey, "React")
-
-  const stories: Stories[] =  [
+  const [stories, setStories] = useState<Stories[]>( [
     {
       title: 'React',
       url: 'http://reactjs.org/',
@@ -119,7 +136,7 @@ const App = () =>  {
       points: 5,
       objectID: 1
     }
-  ]
+  ])
 
   console.log('App renders')
 
@@ -127,6 +144,11 @@ const App = () =>  {
   
   const handleSearchTermChanged = (newTerm: string) => {
     setSearchTerm(newTerm)
+  }
+
+  const handleRemoveStory = (objectID: number) => {
+    const newStories = stories.filter((story) => story.objectID !== objectID)
+    setStories(newStories)
   }
 
   return (
@@ -143,7 +165,7 @@ const App = () =>  {
       </InputWithLabel>
       <hr />
       <ul>
-        <List list={filteredStories} />
+        <List list={filteredStories} onRemoveClicked={handleRemoveStory} />
       </ul>
     </div>
   )
