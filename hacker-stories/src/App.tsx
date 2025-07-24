@@ -13,18 +13,6 @@ const searchKey = 'search';
 
 type StorageValueType =  string;
 
-const useStorageState = (key: string, initialValue: StorageValueType): 
-    [StorageValueType, Dispatch<SetStateAction<StorageValueType>>] => {
-    const [value, setValue] = useState<StorageValueType>(localStorage.getItem(key) || initialValue)
-
-    useEffect(() => {
-        localStorage.setItem(key, value)
-        console.log(`%cuseStorageState changed to: ${value}`, 'font-weight: bold; color: green;')
-    }, [value, key])
-
-    return [value, setValue]
-}
-
 interface Stories {
   title: string;
   url: string;
@@ -41,6 +29,49 @@ interface ItemListProps {
   num_comments: number;
   points: number;
   onRemoveClicked: () => void;
+}
+
+interface FetchDataResult {
+    data: {
+        stories: Stories[];
+    }
+}
+
+const initialStories =  [
+    {
+      title: 'React',
+      url: 'http://reactjs.org/',
+      author: 'Jordan Walke',
+      num_comments: 3,
+      points: 4,
+      objectID: 0
+    },
+    {
+      title: 'Redux',
+      url: 'https://redux.js.org/',
+      author: 'Dan Abramov, Andrew Clark',
+      num_comments: 2,
+      points: 5,
+      objectID: 1
+    }
+  ]
+
+const getAsyncStories: () => Promise<FetchDataResult> = () => new Promise((resolve)=> {
+    setTimeout(() => {
+        resolve({ data: { stories: initialStories } })
+    }, 2000)
+})
+
+const useStorageState = (key: string, initialValue: StorageValueType): 
+    [StorageValueType, Dispatch<SetStateAction<StorageValueType>>] => {
+    const [value, setValue] = useState<StorageValueType>(localStorage.getItem(key) || initialValue)
+
+    useEffect(() => {
+        localStorage.setItem(key, value)
+        console.log(`%cuseStorageState changed to: ${value}`, 'font-weight: bold; color: green;')
+    }, [value, key])
+
+    return [value, setValue]
 }
 
 const ItemList = ({ url, title, author, num_comments, points, onRemoveClicked } : ItemListProps) => {
@@ -119,26 +150,15 @@ const InputWithLabel = ({ id, value, type, onValueChanged, children, autofocus }
 
 const App = () =>  {
   const [searchTerm, setSearchTerm] = useStorageState(searchKey, "React")
-  const [stories, setStories] = useState<Stories[]>( [
-    {
-      title: 'React',
-      url: 'http://reactjs.org/',
-      author: 'Jordan Walke',
-      num_comments: 3,
-      points: 4,
-      objectID: 0
-    },
-    {
-      title: 'Redux',
-      url: 'https://redux.js.org/',
-      author: 'Dan Abramov, Andrew Clark',
-      num_comments: 2,
-      points: 5,
-      objectID: 1
-    }
-  ])
+  const [stories, setStories] = useState<Stories[]>([])
 
-  console.log('App renders')
+  useEffect(() => {
+    const fetchData = async () => {
+        const result = await getAsyncStories()
+        setStories(result.data.stories)
+    }
+    fetchData()
+  }, [])
 
   const filteredStories = stories.filter(({title}) => title.toLowerCase().includes(searchTerm.toLowerCase()))
   
