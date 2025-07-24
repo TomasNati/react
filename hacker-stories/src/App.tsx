@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent , type FocusEvent, useEffect, type Dispatch, type SetStateAction, type HTMLInputTypeAttribute} from 'react'
+import { useState, type ChangeEvent , type FocusEvent, useEffect, type Dispatch, type SetStateAction, type HTMLInputTypeAttribute, useRef} from 'react'
 import './App.css'
 
 const searchKey = 'search';
@@ -64,6 +64,14 @@ interface InputWithLabelProps {
 }
 const InputWithLabel = ({ id, value, type, onValueChanged, children, autofocus }: InputWithLabelProps) => {
 
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (autofocus && inputRef.current) {
+        inputRef.current.focus()
+    }
+}, [inputRef, autofocus])
+
   const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
     onValueChanged(event.target.value)
   }
@@ -73,6 +81,7 @@ const InputWithLabel = ({ id, value, type, onValueChanged, children, autofocus }
   }
 
   console.log('InputWithLabel renders')
+  console.log('Autofocus is:', autofocus)
 
   return (
     <>
@@ -82,7 +91,8 @@ const InputWithLabel = ({ id, value, type, onValueChanged, children, autofocus }
         id={id} value={value} 
         onChange={onChangeHandler} 
         onBlur={onBlurHandler} 
-        autoFocus={autofocus}   
+        ref={inputRef}
+        // autoFocus={autofocus}   . Property commented out to show how to use useRef hook instead
       />
       <p>Entered value: {value}</p>
     </>
