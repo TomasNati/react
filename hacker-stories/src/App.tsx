@@ -8,19 +8,11 @@ import { useState,
     useRef
 } from 'react'
 import './App.css'
+import { deleteAsyncStories, getAsyncStories, type Stories } from './api';
 
 const searchKey = 'search';
 
 type StorageValueType =  string;
-
-interface Stories {
-  title: string;
-  url: string;
-  author: string;
-  num_comments: number;
-  points: number;
-  objectID: number;
-}
 
 interface ItemListProps {
   url: string;
@@ -30,37 +22,6 @@ interface ItemListProps {
   points: number;
   onRemoveClicked: () => void;
 }
-
-interface FetchDataResult {
-    data: {
-        stories: Stories[];
-    }
-}
-
-const initialStories =  [
-    {
-      title: 'React',
-      url: 'http://reactjs.org/',
-      author: 'Jordan Walke',
-      num_comments: 3,
-      points: 4,
-      objectID: 0
-    },
-    {
-      title: 'Redux',
-      url: 'https://redux.js.org/',
-      author: 'Dan Abramov, Andrew Clark',
-      num_comments: 2,
-      points: 5,
-      objectID: 1
-    }
-  ]
-
-const getAsyncStories: () => Promise<FetchDataResult> = () => new Promise((resolve)=> {
-    setTimeout(() => {
-        resolve({ data: { stories: initialStories } })
-    }, 2000)
-})
 
 const useStorageState = (key: string, initialValue: StorageValueType): 
     [StorageValueType, Dispatch<SetStateAction<StorageValueType>>] => {
@@ -151,11 +112,14 @@ const InputWithLabel = ({ id, value, type, onValueChanged, children, autofocus }
 const App = () =>  {
   const [searchTerm, setSearchTerm] = useStorageState(searchKey, "React")
   const [stories, setStories] = useState<Stories[]>([])
+  const [asyncMessage, setAsyncMessage] = useState<string>('')
 
   useEffect(() => {
     const fetchData = async () => {
+        setAsyncMessage('Loading data...')
         const result = await getAsyncStories()
         setStories(result.data.stories)
+        setAsyncMessage('')
     }
     fetchData()
   }, [])
@@ -166,9 +130,18 @@ const App = () =>  {
     setSearchTerm(newTerm)
   }
 
-  const handleRemoveStory = (objectID: number) => {
-    const newStories = stories.filter((story) => story.objectID !== objectID)
-    setStories(newStories)
+  const handleRemoveStory = async (objectID: number) => {
+    try {
+      setAsyncMessage('Deleting Story and refreshing')
+      const { data: { stories: newStories } } = await deleteAsyncStories(objectID, stories)
+      setAsyncMessage('')
+      setStories(newStories)
+    } catch {
+      setAsyncMessage('There was an error deleting the Story')
+      setTimeout(() => {
+        setAsyncMessage('')
+      }, 2000)
+    }
   }
 
   return (
@@ -184,9 +157,11 @@ const App = () =>  {
             <strong>Search Term:</strong>
       </InputWithLabel>
       <hr />
-      <ul>
-        <List list={filteredStories} onRemoveClicked={handleRemoveStory} />
-      </ul>
+     { asyncMessage ? <p>{asyncMessage}</p>
+        : <ul>
+          <List list={filteredStories} onRemoveClicked={handleRemoveStory} />
+        </ul>
+      }
     </div>
   )
 }
