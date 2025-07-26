@@ -1,10 +1,10 @@
 export interface Stories {
-  title: string;
-  url: string;
-  author: string;
-  num_comments: number;
-  points: number;
-  objectID: number;
+    title: string;
+    url: string;
+    author: string;
+    num_comments: number;
+    points: number;
+    objectID: number;
 }
 
 export interface StoriesResponse {
@@ -13,7 +13,7 @@ export interface StoriesResponse {
     }
 }
 
-const stories: Stories[] =  [
+const stories: Stories[] = [
     {
         title: 'React',
         url: 'http://reactjs.org/',
@@ -46,16 +46,36 @@ export const getAsyncStories = (): Promise<StoriesResponse> => {
     })
 }
 
-export const deleteAsyncStories = (objectIDToDelete: number, currentStories: Stories[]) : Promise<StoriesResponse> => {
-    return new Promise ((resolve, reject) => {
+export const deleteAsyncStories = (objectIDToDelete: number, currentStories: Stories[]): Promise<StoriesResponse> => {
+    return new Promise((resolve, reject) => {
         setTimeout(() => {
             if (!currentStories.find(({ objectID }) => objectID == objectIDToDelete)) {
                 reject(`Could not delete Story with ID: ${objectIDToDelete}`)
             } else {
-                const stories = currentStories.filter(({objectID}) => objectID != objectIDToDelete)
+                const stories = currentStories.filter(({ objectID }) => objectID != objectIDToDelete)
                 resolve({
                     data: {
                         stories
+                    }
+                })
+            }
+        }, 1000)
+    })
+}
+
+export const editAsyncStory = (story: Stories, currentStories: Stories[]): Promise<StoriesResponse> => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (!currentStories.find(({ objectID }) => objectID == story.objectID)) {
+                reject(`Could not update Story with ID: ${story.objectID}`)
+            } else {
+                const newStories: Stories[] = []
+                currentStories.forEach(curStory => {
+                    newStories.push(curStory.objectID == story.objectID ? story : curStory)
+                });
+                resolve({
+                    data: {
+                        stories: newStories
                     }
                 })
             }
