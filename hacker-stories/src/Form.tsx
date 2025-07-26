@@ -7,7 +7,7 @@ function getRandomInt(min: number, max: number): number {
 
 interface StoryFormProps {
     initStory?: Stories;
-    onStorySubmit: (story: Stories) => void;
+    onStorySubmit: (story: Stories, isAdd: boolean) => void;
     onCancel: () => void;
 }
 
@@ -87,7 +87,7 @@ export const StoryForm = ({ initStory, onStorySubmit, onCancel }: StoryFormProps
                 />
             </label>
             <footer style={{ display: "flex", gap: 4 }}>
-                <button onClick={() => onStorySubmit(story)} style={{ width: 'fit-content' }}>
+                <button onClick={() => onStorySubmit(story, !initStory)} style={{ width: 'fit-content' }}>
                     Submit
                 </button>
                 <button onClick={() => onCancel()} style={{ width: 'fit-content' }}>

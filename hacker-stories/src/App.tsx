@@ -9,7 +9,7 @@ import {
   useRef
 } from 'react'
 import './App.css'
-import { deleteAsyncStories, editAsyncStory, getAsyncStories, type Stories } from './api';
+import { addAsyncStory, deleteAsyncStories, editAsyncStory, getAsyncStories, type Stories } from './api';
 import { StoryForm } from './Form'
 
 const searchKey = 'search';
@@ -126,6 +126,7 @@ const App = () => {
   const [stories, setStories] = useState<Stories[]>([])
   const [asyncMessage, setAsyncMessage] = useState<string>('')
   const [storyToEdit, setStoryToEdit] = useState<Stories | undefined>()
+  const [showForm, setShowForm] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -161,26 +162,37 @@ const App = () => {
     const story = stories.find(({ objectID }) => objectID == objectIDToEdit)
     if (!story) return;
     setStoryToEdit(story)
+    setShowForm(true)
   }
 
-  const handleSubmitForm = async (story: Stories) => {
+  const handleAddClicked = () => {
+    setStoryToEdit(undefined)
+    setShowForm(true)
+  }
+
+  const handleSubmitForm = async (story: Stories, isAdd = false) => {
     try {
-      setAsyncMessage('Updating Story and refreshing')
-      const { data: { stories: newStories } } = await editAsyncStory(story, stories)
+      setAsyncMessage(`${isAdd ? 'Adding' : 'Updating'} Story and refreshing`)
+      const { data: { stories: newStories } } = isAdd
+        ? await addAsyncStory(story, stories)
+        : await editAsyncStory(story, stories)
       setAsyncMessage('')
       setStories(newStories)
     } catch {
-      setAsyncMessage('There was an error updating the Story')
+      setAsyncMessage(`There was an error ${isAdd ? 'adding' : 'updating'} the Story`)
       setTimeout(() => {
         setAsyncMessage('')
       }, 2000)
     } finally {
       setStoryToEdit(undefined)
+      setShowForm(false)
     }
-
   }
 
-  const handleCancelForm = () => setStoryToEdit(undefined)
+  const handleCancelForm = () => {
+    setStoryToEdit(undefined)
+    setShowForm(false)
+  }
 
   return (
     <div className="app-container">
@@ -195,8 +207,10 @@ const App = () => {
         <strong>Search Term:</strong>
       </InputWithLabel>
       <hr />
+      <button onClick={handleAddClicked}>Add Story</button>
+      <hr />
       {
-        storyToEdit ? (
+        showForm ? (
           <>
             <StoryForm initStory={storyToEdit} onStorySubmit={handleSubmitForm} onCancel={handleCancelForm} />
             <hr />

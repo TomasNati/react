@@ -33,7 +33,6 @@ const stories: Stories[] = [
 ]
 
 
-
 export const getAsyncStories = (): Promise<StoriesResponse> => {
     return new Promise((resolve) => {
         setTimeout(() => {
@@ -76,6 +75,22 @@ export const editAsyncStory = (story: Stories, currentStories: Stories[]): Promi
                 resolve({
                     data: {
                         stories: newStories
+                    }
+                })
+            }
+        }, 1000)
+    })
+}
+
+export const addAsyncStory = (story: Stories, currentStories: Stories[]): Promise<StoriesResponse> => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (currentStories.find(({ objectID }) => objectID == story.objectID)) {
+                reject(`Story with ID: ${story.objectID} is already present in the collection`)
+            } else {
+                resolve({
+                    data: {
+                        stories: [...currentStories, story]
                     }
                 })
             }
