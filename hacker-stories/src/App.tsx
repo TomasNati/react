@@ -6,11 +6,13 @@ import {
   type Dispatch,
   type SetStateAction,
   type HTMLInputTypeAttribute,
-  useRef
+  useRef,
+  useReducer
 } from 'react'
 import './App.css'
 import { addAsyncStory, deleteAsyncStories, editAsyncStory, getAsyncStories, type Stories } from './api';
 import { StoryForm } from './Form'
+import { storiesReducer } from './reducer';
 
 const searchKey = 'search';
 
@@ -123,22 +125,30 @@ const InputWithLabel = ({ id, value, type, onValueChanged, children, autofocus }
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useStorageState(searchKey, "React")
-  const [stories, setStories] = useState<Stories[]>([])
+  const [storiesState, dispatchStories] = useReducer(storiesReducer, { stories: [], asyncMessage: '' })
   const [asyncMessage, setAsyncMessage] = useState<string>('')
   const [storyToEdit, setStoryToEdit] = useState<Stories | undefined>()
   const [showForm, setShowForm] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
-      setAsyncMessage('Loading data...')
-      const result = await getAsyncStories()
-      setStories(result.data.stories)
-      setAsyncMessage('')
+        try{
+            setAsyncMessage('Loading data...')
+            const result = await getAsyncStories()
+            dispatchStories({ type: 'SET_STORIES', payload: result.data.stories })
+            setAsyncMessage('')
+        } catch (error: unknown) {
+            console.error('Error fetching stories:', error)
+            setAsyncMessage('There was an error fetching the stories')
+            setTimeout(() => {
+                setAsyncMessage('')
+            }, 2000)
+        }
     }
     fetchData()
   }, [])
 
-  const filteredStories = stories.filter(({ title }) => title.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredStories = storiesState.stories.filter(({ title }) => title.toLowerCase().includes(searchTerm.toLowerCase()))
 
   const handleSearchTermChanged = (newTerm: string) => {
     setSearchTerm(newTerm)
@@ -147,7 +157,7 @@ const App = () => {
   const handleRemoveStory = async (objectID: number) => {
     try {
       setAsyncMessage('Deleting Story and refreshing')
-      const { data: { stories: newStories } } = await deleteAsyncStories(objectID, stories)
+      const { data: { stories: newStories } } = await deleteAsyncStories(objectID, storiesState)
       setAsyncMessage('')
       setStories(newStories)
     } catch {
@@ -159,7 +169,7 @@ const App = () => {
   }
 
   const handleEditClicked = (objectIDToEdit: number) => {
-    const story = stories.find(({ objectID }) => objectID == objectIDToEdit)
+    const story = storiesState.find(({ objectID }) => objectID == objectIDToEdit)
     if (!story) return;
     setStoryToEdit(story)
     setShowForm(true)
@@ -174,8 +184,8 @@ const App = () => {
     try {
       setAsyncMessage(`${isAdd ? 'Adding' : 'Updating'} Story and refreshing`)
       const { data: { stories: newStories } } = isAdd
-        ? await addAsyncStory(story, stories)
-        : await editAsyncStory(story, stories)
+        ? await addAsyncStory(story, storiesState)
+        : await editAsyncStory(story, storiesState)
       setAsyncMessage('')
       setStories(newStories)
     } catch {
