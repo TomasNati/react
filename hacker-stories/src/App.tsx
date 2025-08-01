@@ -135,14 +135,14 @@ const App = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        dispatchStories({ type: 'SET_ASYNC_MESSAGE', payload: 'Loading data...' })
+        dispatchStories({ type: 'FETCH_STORIES_START', payload: 'Loading data...' })
         const result = await getAsyncStories()
-        dispatchStories({ type: 'SET_STORIES', payload: result.data.stories })
+        dispatchStories({ type: 'FETCH_STORIES_COMPLETE', payload: result.data.stories })
       } catch (error: unknown) {
         console.error('Error fetching stories:', error)
-        dispatchStories({ type: 'SET_ASYNC_MESSAGE', payload: 'There was an error fetching the stories' })
+        dispatchStories({ type: 'SET_ERROR', payload: 'There was an error fetching the stories' })
         setTimeout(() => {
-          dispatchStories({ type: 'CLEAR_ASYNC_MESSAGE', payload: undefined })
+          dispatchStories({ type: 'CLEAR_ERROR', payload: undefined })
         }, 2000)
       }
     }
@@ -159,13 +159,13 @@ const App = () => {
 
   const handleRemoveStory = async (objectID: number) => {
     try {
-      dispatchStories({ type: 'SET_ASYNC_MESSAGE', payload: 'Deleting Story and refreshing' })
+      dispatchStories({ type: 'DELETE_STORY_START', payload: 'Deleting Story and refreshing' })
       const { data: { stories: newStories } } = await deleteAsyncStories(objectID, stories)
-      dispatchStories({ type: 'SET_STORIES', payload: newStories })
+      dispatchStories({ type: 'DELETE_STORY_COMPLETE', payload: newStories })
     } catch {
-      dispatchStories({ type: 'SET_ASYNC_MESSAGE', payload: 'There was an error deleting the story' })
+      dispatchStories({ type: 'SET_ERROR', payload: 'There was an error deleting the story' })
       setTimeout(() => {
-        dispatchStories({ type: 'CLEAR_ASYNC_MESSAGE', payload: undefined })
+        dispatchStories({ type: 'CLEAR_ERROR', payload: undefined })
       }, 2000)
     }
   }
@@ -173,24 +173,29 @@ const App = () => {
   const handleEditClicked = (objectIDToEdit: number) => {
     const story = stories.find(({ objectID }) => objectID == objectIDToEdit)
     if (!story) return;
-    dispatchStories({ type: 'SET_EDIT_STORY', payload: story })
+    dispatchStories({ type: 'EDIT_STORY_START', payload: story })
   }
 
   const handleAddClicked = () => {
-    dispatchStories({ type: 'SET_ADD_STORY', payload: undefined })
+    dispatchStories({ type: 'ADD_STORY_START', payload: undefined })
   }
 
   const handleSubmitForm = async (story: Stories, isAdd = false) => {
     try {
-      dispatchStories({ type: 'SET_ASYNC_MESSAGE', payload: `${isAdd ? 'Adding' : 'Updating'} Story and refreshing` })
+      dispatchStories({ 
+        type: isAdd ? 'ADD_STORY_PROCESSING' : 'EDIT_STORY_PROCESSING', 
+        payload: `${isAdd ? 'Adding' : 'Updating'} Story and refreshing` })
       const { data: { stories: newStories } } = isAdd
         ? await addAsyncStory(story, stories)
         : await editAsyncStory(story, stories)
-      dispatchStories({ type: 'SET_STORIES', payload: newStories })
+      dispatchStories({
+        type: isAdd ? 'ADD_STORY_COMPLETE' : 'EDIT_STORY_COMPLETE',
+        payload: newStories
+      })
     } catch {
-      dispatchStories({ type: 'SET_ASYNC_MESSAGE', payload: `There was an error ${isAdd ? 'adding' : 'updating'} the Story` })
+      dispatchStories({ type: 'SET_ERROR', payload: `There was an error ${isAdd ? 'adding' : 'updating'} the Story` })
       setTimeout(() => {
-        dispatchStories({ type: 'CLEAR_ASYNC_MESSAGE', payload: undefined })
+        dispatchStories({ type: 'CLEAR_ERROR', payload: undefined })
       }, 2000)
     } finally {
       dispatchStories({ type: 'CLOSE_STORY_FORM', payload: undefined })
