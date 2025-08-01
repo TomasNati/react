@@ -126,29 +126,27 @@ const InputWithLabel = ({ id, value, type, onValueChanged, children, autofocus }
 const App = () => {
   const [searchTerm, setSearchTerm] = useStorageState(searchKey, "React")
   const [storiesState, dispatchStories] = useReducer(storiesReducer, { stories: [], asyncMessage: '' })
-  const [asyncMessage, setAsyncMessage] = useState<string>('')
   const [storyToEdit, setStoryToEdit] = useState<Stories | undefined>()
   const [showForm, setShowForm] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
-        try{
-            setAsyncMessage('Loading data...')
-            const result = await getAsyncStories()
-            dispatchStories({ type: 'SET_STORIES', payload: result.data.stories })
-            setAsyncMessage('')
-        } catch (error: unknown) {
-            console.error('Error fetching stories:', error)
-            setAsyncMessage('There was an error fetching the stories')
-            setTimeout(() => {
-                setAsyncMessage('')
-            }, 2000)
-        }
+      try {
+        dispatchStories({ type: 'SET_ASYNC_MESSAGE', payload: 'Loading data...' })
+        const result = await getAsyncStories()
+        dispatchStories({ type: 'SET_STORIES', payload: result.data.stories })
+      } catch (error: unknown) {
+        console.error('Error fetching stories:', error)
+        dispatchStories({ type: 'SET_ASYNC_MESSAGE', payload: 'There was an error fetching the stories' })
+        setTimeout(() => {
+          dispatchStories({ type: 'CLEAR_ASYNC_MESSAGE', payload: undefined })
+        }, 2000)
+      }
     }
     fetchData()
   }, [])
 
-  const { stories } = storiesState
+  const { stories, asyncMessage } = storiesState
 
   const filteredStories = stories.filter(({ title }) => title.toLowerCase().includes(searchTerm.toLowerCase()))
 
@@ -158,14 +156,13 @@ const App = () => {
 
   const handleRemoveStory = async (objectID: number) => {
     try {
-      setAsyncMessage('Deleting Story and refreshing')
+      dispatchStories({ type: 'SET_ASYNC_MESSAGE', payload: 'Deleting Story and refreshing' })
       const { data: { stories: newStories } } = await deleteAsyncStories(objectID, stories)
-      setAsyncMessage('')
       dispatchStories({ type: 'SET_STORIES', payload: newStories })
     } catch {
-      setAsyncMessage('There was an error deleting the Story')
+      dispatchStories({ type: 'SET_ASYNC_MESSAGE', payload: 'There was an error deleting the story' })
       setTimeout(() => {
-        setAsyncMessage('')
+        dispatchStories({ type: 'CLEAR_ASYNC_MESSAGE', payload: undefined })
       }, 2000)
     }
   }
@@ -184,16 +181,15 @@ const App = () => {
 
   const handleSubmitForm = async (story: Stories, isAdd = false) => {
     try {
-      setAsyncMessage(`${isAdd ? 'Adding' : 'Updating'} Story and refreshing`)
+      dispatchStories({ type: 'SET_ASYNC_MESSAGE', payload: `${isAdd ? 'Adding' : 'Updating'} Story and refreshing` })
       const { data: { stories: newStories } } = isAdd
         ? await addAsyncStory(story, stories)
         : await editAsyncStory(story, stories)
-      setAsyncMessage('')
       dispatchStories({ type: 'SET_STORIES', payload: newStories })
     } catch {
-      setAsyncMessage(`There was an error ${isAdd ? 'adding' : 'updating'} the Story`)
+      dispatchStories({ type: 'SET_ASYNC_MESSAGE', payload: `There was an error ${isAdd ? 'adding' : 'updating'} the Story` })
       setTimeout(() => {
-        setAsyncMessage('')
+        dispatchStories({ type: 'CLEAR_ASYNC_MESSAGE', payload: undefined })
       }, 2000)
     } finally {
       setStoryToEdit(undefined)
