@@ -125,9 +125,12 @@ const InputWithLabel = ({ id, value, type, onValueChanged, children, autofocus }
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useStorageState(searchKey, "React")
-  const [storiesState, dispatchStories] = useReducer(storiesReducer, { stories: [], asyncMessage: '' })
-  const [storyToEdit, setStoryToEdit] = useState<Stories | undefined>()
-  const [showForm, setShowForm] = useState(false)
+  const [storiesState, dispatchStories] = useReducer(storiesReducer, {
+    stories: [],
+    asyncMessage: '',
+    storyToEdit: undefined,
+    showForm: false
+  })
 
   useEffect(() => {
     const fetchData = async () => {
@@ -146,7 +149,7 @@ const App = () => {
     fetchData()
   }, [])
 
-  const { stories, asyncMessage } = storiesState
+  const { stories, asyncMessage, storyToEdit, showForm } = storiesState
 
   const filteredStories = stories.filter(({ title }) => title.toLowerCase().includes(searchTerm.toLowerCase()))
 
@@ -170,13 +173,11 @@ const App = () => {
   const handleEditClicked = (objectIDToEdit: number) => {
     const story = stories.find(({ objectID }) => objectID == objectIDToEdit)
     if (!story) return;
-    setStoryToEdit(story)
-    setShowForm(true)
+    dispatchStories({ type: 'SET_EDIT_STORY', payload: story })
   }
 
   const handleAddClicked = () => {
-    setStoryToEdit(undefined)
-    setShowForm(true)
+    dispatchStories({ type: 'SET_ADD_STORY', payload: undefined })
   }
 
   const handleSubmitForm = async (story: Stories, isAdd = false) => {
@@ -192,14 +193,12 @@ const App = () => {
         dispatchStories({ type: 'CLEAR_ASYNC_MESSAGE', payload: undefined })
       }, 2000)
     } finally {
-      setStoryToEdit(undefined)
-      setShowForm(false)
+      dispatchStories({ type: 'CLOSE_STORY_FORM', payload: undefined })
     }
   }
 
   const handleCancelForm = () => {
-    setStoryToEdit(undefined)
-    setShowForm(false)
+    dispatchStories({ type: 'CLOSE_STORY_FORM', payload: undefined })
   }
 
   return (
