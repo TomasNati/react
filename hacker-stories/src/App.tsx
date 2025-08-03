@@ -42,7 +42,6 @@ const useStorageState = (key: string, initialValue: StorageValueType):
 }
 
 const ItemList = ({ url, title, author, num_comments, points, onRemoveClicked, onEditClicked }: ItemListProps) => {
-  console.log(`Item with url ${url} renders`)
   return (
     <li>
       <a href={url} target="_blank">{title}</a>
@@ -65,7 +64,6 @@ interface ListProps {
   onEditClicked: (objectID: number) => void;
 }
 const List = ({ list, onRemoveClicked, onEditClicked }: ListProps) => {
-  console.log('List renders')
   // rest operator on the left, {objectID,...item}, destructure objectID current element in the list, 
   //   assigning the rest of the properties to a new object, 'item'.
   // spread operator on the right, ...item, creates key=value pairs for each operator in item object
@@ -105,9 +103,6 @@ const InputWithLabel = ({ id, value, type, onValueChanged, children, autofocus }
     console.log(event)
   }
 
-  console.log('InputWithLabel renders')
-  console.log('Autofocus is:', autofocus)
-
   return (
     <>
       <label htmlFor={id}>{children} </label>
@@ -136,8 +131,9 @@ const App = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        if (searchTerm == '') return
         dispatchStories({ type: 'FETCH_STORIES_START', payload: 'Loading data...' })
-        const result = await getAsyncStories()
+        const result = await getAsyncStories(searchTerm)
         dispatchStories({ type: 'FETCH_STORIES_COMPLETE', payload: result.data.stories })
       } catch (error: unknown) {
         console.error('Error fetching stories:', error)
@@ -148,11 +144,9 @@ const App = () => {
       }
     }
     fetchData()
-  }, [])
+  }, [searchTerm])
 
   const { stories, asyncMessage, storyToEdit, showForm } = storiesState
-
-  const filteredStories = stories.filter(({ title }) => title.toLowerCase().includes(searchTerm.toLowerCase()))
 
   const handleSearchTermChanged = (newTerm: string) => {
     setSearchTerm(newTerm)
@@ -183,9 +177,10 @@ const App = () => {
 
   const handleSubmitForm = async (story: Stories, isAdd = false) => {
     try {
-      dispatchStories({ 
-        type: isAdd ? 'ADD_STORY_PROCESSING' : 'EDIT_STORY_PROCESSING', 
-        payload: `${isAdd ? 'Adding' : 'Updating'} Story and refreshing` })
+      dispatchStories({
+        type: isAdd ? 'ADD_STORY_PROCESSING' : 'EDIT_STORY_PROCESSING',
+        payload: `${isAdd ? 'Adding' : 'Updating'} Story and refreshing`
+      })
       const { data: { stories: newStories } } = isAdd
         ? await addAsyncStory(story, stories)
         : await editAsyncStory(story, stories)
@@ -231,7 +226,7 @@ const App = () => {
       }
       {asyncMessage ? <p>{asyncMessage}</p>
         : <ul>
-          <List list={filteredStories} onRemoveClicked={handleRemoveStory} onEditClicked={handleEditClicked} />
+          <List list={stories} onRemoveClicked={handleRemoveStory} onEditClicked={handleEditClicked} />
         </ul>
       }
     </div>

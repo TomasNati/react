@@ -20,9 +20,9 @@ export interface StoriesResponse {
 }
 
 
-export const getAsyncStories = (): Promise<StoriesUI> => {
+export const getAsyncStories = (query: string): Promise<StoriesUI> => {
+    const getUrl = `${BASE_URL}search?query=${query}`
     return new Promise(async (resolve, reject) => {
-        const getUrl = `${BASE_URL}search?query=react`
         const fetchResult = await fetch(getUrl)
         if (fetchResult.ok) {
             const response: StoriesResponse = await fetchResult.json()
