@@ -1,11 +1,18 @@
 import type { Stories } from "./api-fake";
 
 type ACTION_TYPE =
-    'SET_STORIES' |
-    'SET_ASYNC_MESSAGE' |
-    'CLEAR_ASYNC_MESSAGE' |
-    'SET_EDIT_STORY' |
-    'SET_ADD_STORY' |
+    'FETCH_STORIES_START' |
+    'FETCH_STORIES_COMPLETE' |
+    'DELETE_STORY_START' |
+    'DELETE_STORY_COMPLETE' |
+    'EDIT_STORY_START' |
+    'EDIT_STORY_PROCESSING' |
+    'EDIT_STORY_COMPLETE' |
+    'ADD_STORY_START' |
+    'ADD_STORY_PROCESSING' |
+    'ADD_STORY_COMPLETE' |
+    'SET_ERROR' |
+    'CLEAR_ERROR' |
     'CLOSE_STORY_FORM'
 
 interface StoriesState {
@@ -22,23 +29,34 @@ interface ReducerAction {
 
 export const storiesReducer = (state: StoriesState, action: ReducerAction): StoriesState => {
     switch (action.type) {
-        case 'SET_STORIES':
+        case 'FETCH_STORIES_START':
+        case 'DELETE_STORY_START':
+        case 'EDIT_STORY_PROCESSING':
+        case 'ADD_STORY_PROCESSING':
+            return {
+                ...state,
+                asyncMessage: action.payload as string,
+            }
+        case 'FETCH_STORIES_COMPLETE':
+        case 'DELETE_STORY_COMPLETE':
+        case 'EDIT_STORY_COMPLETE':
+        case 'ADD_STORY_COMPLETE':
             return {
                 ...state,
                 asyncMessage: '',
                 stories: action.payload as Stories[]
             };
-        case 'SET_ASYNC_MESSAGE':
+        case 'SET_ERROR':
             return {
                 ...state,
                 asyncMessage: action.payload as string
             }
-        case 'CLEAR_ASYNC_MESSAGE':
+        case 'CLEAR_ERROR':
             return {
                 ...state,
                 asyncMessage: ''
             }
-        case 'SET_EDIT_STORY':
+        case 'EDIT_STORY_START':
             if (!action.payload) {
                 throw new Error('No Story to edit')
             }
@@ -47,7 +65,7 @@ export const storiesReducer = (state: StoriesState, action: ReducerAction): Stor
                 storyToEdit: action.payload as Stories,
                 showForm: true
             }
-        case 'SET_ADD_STORY':
+        case 'ADD_STORY_START':
             return {
                 ...state,
                 storyToEdit: undefined,
