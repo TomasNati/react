@@ -1,3 +1,5 @@
+const BASE_URL = 'https://hn.algolia.com/api/v1/'
+
 export interface Stories {
     title: string;
     url: string;
@@ -7,93 +9,30 @@ export interface Stories {
     objectID: number;
 }
 
-export interface StoriesResponse {
+export interface StoriesUI {
     data: {
         stories: Stories[]
     }
 }
 
-const stories: Stories[] = [
-    {
-        title: 'React',
-        url: 'http://reactjs.org/',
-        author: 'Jordan Walke',
-        num_comments: 3,
-        points: 4,
-        objectID: 0
-    },
-    {
-        title: 'Redux',
-        url: 'https://redux.js.org/',
-        author: 'Dan Abramov, Andrew Clark',
-        num_comments: 2,
-        points: 5,
-        objectID: 1
-    }
-]
+export interface StoriesResponse {
+    hits: Stories[]
+}
 
 
-export const getAsyncStories = (): Promise<StoriesResponse> => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
+export const getAsyncStories = (): Promise<StoriesUI> => {
+    return new Promise(async (resolve, reject) => {
+        const getUrl = `${BASE_URL}search?query=react`
+        const fetchResult = await fetch(getUrl)
+        if (fetchResult.ok) {
+            const response: StoriesResponse = await fetchResult.json()
             resolve({
                 data: {
-                    stories
+                    stories: response.hits
                 }
             })
-        }, 1200)
-    })
-}
-
-export const deleteAsyncStories = (objectIDToDelete: number, currentStories: Stories[]): Promise<StoriesResponse> => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            if (!currentStories.find(({ objectID }) => objectID == objectIDToDelete)) {
-                reject(`Could not delete Story with ID: ${objectIDToDelete}`)
-            } else {
-                const stories = currentStories.filter(({ objectID }) => objectID != objectIDToDelete)
-                resolve({
-                    data: {
-                        stories
-                    }
-                })
-            }
-        }, 1000)
-    })
-}
-
-export const editAsyncStory = (story: Stories, currentStories: Stories[]): Promise<StoriesResponse> => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            if (!currentStories.find(({ objectID }) => objectID == story.objectID)) {
-                reject(`Could not update Story with ID: ${story.objectID}`)
-            } else {
-                const newStories: Stories[] = []
-                currentStories.forEach(curStory => {
-                    newStories.push(curStory.objectID == story.objectID ? story : curStory)
-                });
-                resolve({
-                    data: {
-                        stories: newStories
-                    }
-                })
-            }
-        }, 1000)
-    })
-}
-
-export const addAsyncStory = (story: Stories, currentStories: Stories[]): Promise<StoriesResponse> => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            if (currentStories.find(({ objectID }) => objectID == story.objectID)) {
-                reject(`Story with ID: ${story.objectID} is already present in the collection`)
-            } else {
-                resolve({
-                    data: {
-                        stories: [...currentStories, story]
-                    }
-                })
-            }
-        }, 1000)
+        } else {
+            reject(`Invalid response: ${fetchResult.status}`)
+        }
     })
 }

@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from "react";
-import type { Stories } from "./api";
+import type { Stories } from "./api-fake";
 
 function getRandomInt(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;

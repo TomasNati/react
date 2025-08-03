@@ -10,7 +10,8 @@ import {
   useReducer
 } from 'react'
 import './App.css'
-import { addAsyncStory, deleteAsyncStories, editAsyncStory, getAsyncStories, type Stories } from './api';
+import { addAsyncStory, deleteAsyncStories, editAsyncStory } from './api-fake';
+import { type Stories, getAsyncStories } from './api';
 import { StoryForm } from './Form'
 import { storiesReducer } from './reducer';
 

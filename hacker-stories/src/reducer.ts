@@ -1,4 +1,4 @@
-import type { Stories } from "./api";
+import type { Stories } from "./api-fake";
 
 type ACTION_TYPE =
     'SET_STORIES' |
