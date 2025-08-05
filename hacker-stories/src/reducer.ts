@@ -1,4 +1,4 @@
-import type { Stories } from "./api-fake";
+import type { Stories } from "./api";
 
 type ACTION_TYPE =
     'FETCH_STORIES_START' |

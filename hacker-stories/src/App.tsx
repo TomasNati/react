@@ -7,7 +7,8 @@ import {
   type SetStateAction,
   type HTMLInputTypeAttribute,
   useRef,
-  useReducer
+  useReducer,
+  useCallback
 } from 'react'
 import './App.css'
 import { addAsyncStory, deleteAsyncStories, editAsyncStory } from './api-fake';
@@ -128,23 +129,24 @@ const App = () => {
     showForm: false
   })
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (searchTerm == '') return
-        dispatchStories({ type: 'FETCH_STORIES_START', payload: 'Loading data...' })
-        const result = await getAsyncStories(searchTerm)
-        dispatchStories({ type: 'FETCH_STORIES_COMPLETE', payload: result.data.stories })
-      } catch (error: unknown) {
-        console.error('Error fetching stories:', error)
-        dispatchStories({ type: 'SET_ERROR', payload: 'There was an error fetching the stories' })
-        setTimeout(() => {
-          dispatchStories({ type: 'CLEAR_ERROR', payload: undefined })
-        }, 2000)
-      }
-    }
-    fetchData()
+  const fetchStories = useCallback(async() => {
+    try {
+            if (searchTerm == '') return
+            dispatchStories({ type: 'FETCH_STORIES_START', payload: 'Loading data...' })
+            const result = await getAsyncStories(searchTerm)
+            dispatchStories({ type: 'FETCH_STORIES_COMPLETE', payload: result.data.stories })
+        } catch (error: unknown) {
+            console.error('Error fetching stories:', error)
+            dispatchStories({ type: 'SET_ERROR', payload: 'There was an error fetching the stories' })
+            setTimeout(() => {
+            dispatchStories({ type: 'CLEAR_ERROR', payload: undefined })
+            }, 2000)
+        }
   }, [searchTerm])
+  
+  useEffect(() => {
+    fetchStories()
+  }, [fetchStories])
 
   const { stories, asyncMessage, storyToEdit, showForm } = storiesState
 
