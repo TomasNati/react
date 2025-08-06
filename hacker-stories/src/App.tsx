@@ -122,6 +122,7 @@ const InputWithLabel = ({ id, value, type, onValueChanged, children, autofocus }
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useStorageState(searchKey, "React")
+  const [triggerCount, setTriggerCount] = useState(0)
   const [storiesState, dispatchStories] = useReducer(storiesReducer, {
     stories: [],
     asyncMessage: '',
@@ -129,26 +130,27 @@ const App = () => {
     showForm: false
   })
 
-  const fetchStories = useCallback(async() => {
+  const { stories, asyncMessage, storyToEdit, showForm } = storiesState
+
+
+  const fetchStories = useCallback(async () => {
     try {
-            if (searchTerm == '') return
-            dispatchStories({ type: 'FETCH_STORIES_START', payload: 'Loading data...' })
-            const result = await getAsyncStories(searchTerm)
-            dispatchStories({ type: 'FETCH_STORIES_COMPLETE', payload: result.data.stories })
-        } catch (error: unknown) {
-            console.error('Error fetching stories:', error)
-            dispatchStories({ type: 'SET_ERROR', payload: 'There was an error fetching the stories' })
-            setTimeout(() => {
-            dispatchStories({ type: 'CLEAR_ERROR', payload: undefined })
-            }, 2000)
-        }
-  }, [searchTerm])
-  
+      if (searchTerm == '') return
+      dispatchStories({ type: 'FETCH_STORIES_START', payload: 'Loading data...' })
+      const result = await getAsyncStories(searchTerm)
+      dispatchStories({ type: 'FETCH_STORIES_COMPLETE', payload: result.data.stories })
+    } catch (error: unknown) {
+      console.error('Error fetching stories:', error)
+      dispatchStories({ type: 'SET_ERROR', payload: 'There was an error fetching the stories' })
+      setTimeout(() => {
+        dispatchStories({ type: 'CLEAR_ERROR', payload: undefined })
+      }, 2000)
+    }
+  }, [triggerCount])
+
   useEffect(() => {
     fetchStories()
   }, [fetchStories])
-
-  const { stories, asyncMessage, storyToEdit, showForm } = storiesState
 
   const handleSearchTermChanged = (newTerm: string) => {
     setSearchTerm(newTerm)
@@ -204,6 +206,8 @@ const App = () => {
     dispatchStories({ type: 'CLOSE_STORY_FORM', payload: undefined })
   }
 
+  const handleTriggerSearch = () => setTriggerCount((count: number) => count + 1)
+
   return (
     <div className="app-container">
       <h1>My Hacker Stories 2</h1>
@@ -217,7 +221,13 @@ const App = () => {
         <strong>Search Term:</strong>
       </InputWithLabel>
       <hr />
-      <button onClick={handleAddClicked}>Add Story</button>
+      <div style={{
+        display: 'flex',
+        gap: 3
+      }}>
+        <button onClick={handleAddClicked}>Add Story</button>
+        <button onClick={handleTriggerSearch} disabled={!searchTerm}>Search</button>
+      </div>
       <hr />
       {
         showForm ? (
