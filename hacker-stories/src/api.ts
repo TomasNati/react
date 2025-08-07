@@ -1,3 +1,5 @@
+import axios from "axios";
+
 const BASE_URL = "https://hn.algolia.com/api/v1/";
 
 export interface Stories {
@@ -23,16 +25,15 @@ export const getAsyncStories = (query: string): Promise<StoriesUI> => {
   const getUrl = `${BASE_URL}search?query=${query}`;
   return new Promise((resolve, reject) => {
     const asyncFetch = async () => {
-      const fetchResult = await fetch(getUrl);
-      if (fetchResult.ok) {
-        const response: StoriesResponse = await fetchResult.json();
+      const response = await axios.get<StoriesResponse>(getUrl)
+      if (response.status == 200) {
         resolve({
           data: {
-            stories: response.hits,
+            stories: response.data.hits,
           },
         });
       } else {
-        reject(`Invalid response: ${fetchResult.status}`);
+        reject(`Invalid response: ${response.status}`);
       }
     };
 
