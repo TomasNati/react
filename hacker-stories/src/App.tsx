@@ -8,7 +8,7 @@ import {
   type FormEvent
 } from 'react'
 import './App.css'
-import { addAsyncStory, deleteAsyncStories, editAsyncStory } from './api-fake';
+import { addAsyncStory, deleteAsyncStories, editAsyncStory, getAsyncStories as fakeGetAsyncStories } from './api-fake';
 import { type Stories, getAsyncStories } from './api';
 import { StoryForm } from './Form'
 import { storiesReducer } from './reducer';
@@ -81,6 +81,7 @@ const List = ({ list, onRemoveClicked, onEditClicked }: ListProps) => {
 const App = () => {
   const [searchTerm, setSearchTerm] = useStorageState(searchKey, "React")
   const [triggerCount, setTriggerCount] = useState(0)
+  const [usarApiFake, setUsarApiFake] = useState(false)
   const [storiesState, dispatchStories] = useReducer(storiesReducer, {
     stories: [],
     asyncMessage: '',
@@ -95,7 +96,7 @@ const App = () => {
     try {
       if (searchTerm == '') return
       dispatchStories({ type: 'FETCH_STORIES_START', payload: 'Loading data...' })
-      const result = await getAsyncStories(searchTerm)
+      const result = usarApiFake ? await fakeGetAsyncStories() : await getAsyncStories(searchTerm)
       dispatchStories({ type: 'FETCH_STORIES_COMPLETE', payload: result.data.stories })
     } catch (error: unknown) {
       console.error('Error fetching stories:', error)
@@ -177,7 +178,14 @@ const App = () => {
         handleSearchTermChanged={handleSearchTermChanged}
         searchTerm={searchTerm}
       />
-      <button onClick={handleAddClicked}>Add Story</button>
+      <hr />
+      <div style={{
+        marginTop: '5px'
+      }}>
+        <button onClick={handleAddClicked}>Add Story</button>
+        <input type='checkbox' checked={usarApiFake} onChange={(event) => setUsarApiFake(event.target.checked)} />
+        <span>Usar API fake</span>
+      </div>
       <hr />
       {
         showForm ? (

@@ -67,7 +67,6 @@ export const SimpleForm = ({ handleTriggerSearch, handleSearchTermChanged, searc
             >
                 <strong>Search Term:</strong>
             </InputWithLabel>
-            <hr />
             <div style={{
                 display: 'flex',
                 gap: 3
