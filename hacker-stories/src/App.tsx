@@ -1,20 +1,18 @@
 import {
   useState,
-  type ChangeEvent,
-  type FocusEvent,
   useEffect,
   type Dispatch,
   type SetStateAction,
-  type HTMLInputTypeAttribute,
-  useRef,
   useReducer,
-  useCallback
+  useCallback,
+  type FormEvent
 } from 'react'
 import './App.css'
 import { addAsyncStory, deleteAsyncStories, editAsyncStory } from './api-fake';
 import { type Stories, getAsyncStories } from './api';
 import { StoryForm } from './Form'
 import { storiesReducer } from './reducer';
+import { SimpleForm } from './SimpleForm'
 
 const searchKey = 'search';
 
@@ -78,47 +76,7 @@ const List = ({ list, onRemoveClicked, onEditClicked }: ListProps) => {
   ))
 }
 
-interface InputWithLabelProps {
-  value: string;
-  id: string;
-  type?: HTMLInputTypeAttribute | undefined;
-  autofocus?: boolean;
-  onValueChanged: (term: string) => void
-  children?: React.ReactNode;
-}
-const InputWithLabel = ({ id, value, type, onValueChanged, children, autofocus }: InputWithLabelProps) => {
 
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    if (autofocus && inputRef.current) {
-      inputRef.current.focus()
-    }
-  }, [inputRef, autofocus])
-
-  const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
-    onValueChanged(event.target.value)
-  }
-
-  const onBlurHandler = (event: FocusEvent<HTMLInputElement>) => {
-    console.log(event)
-  }
-
-  return (
-    <>
-      <label htmlFor={id}>{children} </label>
-      <input
-        type={type || 'text'}
-        id={id} value={value}
-        onChange={onChangeHandler}
-        onBlur={onBlurHandler}
-        ref={inputRef}
-      // autoFocus={autofocus}   . Property commented out to show how to use useRef hook instead
-      />
-      <p>Entered value: {value}</p>
-    </>
-  )
-}
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useStorageState(searchKey, "React")
@@ -206,28 +164,20 @@ const App = () => {
     dispatchStories({ type: 'CLOSE_STORY_FORM', payload: undefined })
   }
 
-  const handleTriggerSearch = () => setTriggerCount((count: number) => count + 1)
+  const handleTriggerSearch = (event: FormEvent) => {
+    setTriggerCount((count: number) => count + 1)
+    event.preventDefault();
+  }
 
   return (
     <div className="app-container">
       <h1>My Hacker Stories 2</h1>
-      <InputWithLabel
-        id="search-term"
-        value={searchTerm}
-        type='text'
-        onValueChanged={handleSearchTermChanged}
-        autofocus
-      >
-        <strong>Search Term:</strong>
-      </InputWithLabel>
-      <hr />
-      <div style={{
-        display: 'flex',
-        gap: 3
-      }}>
-        <button onClick={handleAddClicked}>Add Story</button>
-        <button onClick={handleTriggerSearch} disabled={!searchTerm}>Search</button>
-      </div>
+      <SimpleForm
+        handleTriggerSearch={handleTriggerSearch}
+        handleSearchTermChanged={handleSearchTermChanged}
+        searchTerm={searchTerm}
+      />
+      <button onClick={handleAddClicked}>Add Story</button>
       <hr />
       {
         showForm ? (
