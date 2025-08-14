@@ -35,16 +35,17 @@ const InputWithLabel = ({ id, value, type, onValueChanged, children, autofocus }
 
     return (
         <>
-            <label htmlFor={id}>{children} </label>
+            <label htmlFor={id} className="label">{children} </label>
             <input
                 type={type || 'text'}
                 id={id} value={value}
                 onChange={onChangeHandler}
                 onBlur={onBlurHandler}
                 ref={inputRef}
+                className="input"
             // autoFocus={autofocus}   . Property commented out to show how to use useRef hook instead
             />
-            <p>Entered value: {value}</p>
+            <p className="entered-value">Entered value: {value}</p>
         </>
     )
 }
@@ -57,7 +58,7 @@ interface SimpleFormProps {
 export const SimpleForm = ({ handleTriggerSearch, handleSearchTermChanged, searchTerm }: SimpleFormProps) => {
 
     return (
-        <form onSubmit={handleTriggerSearch}>
+        <form onSubmit={handleTriggerSearch} className="search-form">
             <InputWithLabel
                 id="search-term"
                 value={searchTerm}
@@ -71,7 +72,7 @@ export const SimpleForm = ({ handleTriggerSearch, handleSearchTermChanged, searc
                 display: 'flex',
                 gap: 3
             }}>
-                <button type='submit' disabled={!searchTerm}>Search</button>
+                <button type='submit' disabled={!searchTerm} className="button button_large">Search</button>
             </div>
         </form>
     )
