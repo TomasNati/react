@@ -13,6 +13,7 @@ import { type Stories, getAsyncStories } from './api';
 import { StoryForm } from './Form'
 import { storiesReducer } from './reducer';
 import { SimpleForm } from './SimpleForm'
+import Check from './check.svg?react';
 
 const searchKey = 'search';
 
@@ -42,15 +43,17 @@ const useStorageState = (key: string, initialValue: StorageValueType):
 
 const ItemList = ({ url, title, author, num_comments, points, onRemoveClicked, onEditClicked }: ItemListProps) => {
   return (
-    <li>
-      <a href={url} target="_blank">{title}</a>
-      <p>Authors: {author}</p>
-      <p>Number of comments: {num_comments}</p>
-      <p>Points: {points}</p>
-      <div>
-        <button onClick={onRemoveClicked}>Remove</button>
+    <li className='item'>
+      <span style={{width: '35%'}}><a href={url} target="_blank">{title}</a></span>
+      <span style={{width: '25%'}}><p>Authors: {author}</p></span>
+      <span style={{width: '15%'}}><p>Number of comments: {num_comments}</p></span>
+      <span style={{width: '15%'}}><p>Points: {points}</p></span>
+      <span style={{width: '10%'}}>
+        <button onClick={onRemoveClicked}>
+            <Check height="18px" width="18px" />
+        </button>
         <button onClick={onEditClicked}>Edit</button>
-      </div>
+      </span>
       <br />
       <br />
     </li>
