@@ -5,7 +5,9 @@ import {
   type SetStateAction,
   useReducer,
   useCallback,
-  type FormEvent
+  type FormEvent,
+  useRef,
+  RefObject
 } from 'react'
 import './App.css'
 import { addAsyncStory, deleteAsyncStories, editAsyncStory, getAsyncStories as fakeGetAsyncStories } from './api-fake';
@@ -29,14 +31,18 @@ interface ItemListProps {
   onEditClicked: () => void;
 }
 
-const useStorageState = (key: string, initialValue: StorageValueType):
+const useStorageState = (key: string, initialValue: StorageValueType, isMounted: RefObject<boolean>):
   [StorageValueType, Dispatch<SetStateAction<StorageValueType>>] => {
   const [value, setValue] = useState<StorageValueType>(localStorage.getItem(key) || initialValue)
 
   useEffect(() => {
-    localStorage.setItem(key, value)
-    console.log(`%cuseStorageState changed to: ${value}`, 'font-weight: bold; color: green;')
-  }, [value, key])
+    if (!isMounted.current) {
+        isMounted.current = true;
+    } else {
+        localStorage.setItem(key, value)
+        console.log(`%cuseStorageState changed to: ${value}`, 'font-weight: bold; color: green;')
+    }
+  }, [value, key, isMounted])
 
   return [value, setValue]
 }
@@ -82,7 +88,9 @@ const List = ({ list, onRemoveClicked, onEditClicked }: ListProps) => {
 
 
 const App = () => {
-  const [searchTerm, setSearchTerm] = useStorageState(searchKey, "React")
+  const isMounted = useRef(false)
+  const [searchTerm, setSearchTerm] = useStorageState(searchKey, "React", isMounted)
+  
   const [triggerCount, setTriggerCount] = useState(0)
   const [usarApiFake, setUsarApiFake] = useState(false)
   const [storiesState, dispatchStories] = useReducer(storiesReducer, {
@@ -111,6 +119,7 @@ const App = () => {
   }, [triggerCount])
 
   useEffect(() => {
+    console.log('Fetching stories')
     fetchStories()
   }, [fetchStories])
 
