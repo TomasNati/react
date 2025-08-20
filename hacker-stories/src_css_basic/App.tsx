@@ -16,6 +16,7 @@ import { StoryForm } from './Form'
 import { storiesReducer } from './reducer';
 import { SimpleForm } from './SimpleForm'
 import Check from './check.svg?react';
+import React from 'react';
 
 const searchKey = 'search';
 
@@ -71,19 +72,19 @@ interface ListProps {
   onRemoveClicked: (objectID: number) => void
   onEditClicked: (objectID: number) => void;
 }
-const List = ({ list, onRemoveClicked, onEditClicked }: ListProps) => {
+const List = React.memo(({ list, onRemoveClicked, onEditClicked }: ListProps) => {
   // rest operator on the left, {objectID,...item}, destructure objectID current element in the list, 
   //   assigning the rest of the properties to a new object, 'item'.
   // spread operator on the right, ...item, creates key=value pairs for each operator in item object
+  console.log('B:List')
   return list.map(({ objectID, ...item }) => (
     <ItemList
-      key={objectID}
       onRemoveClicked={() => onRemoveClicked(objectID)}
       onEditClicked={() => onEditClicked(objectID)}
       {...item}
     />
   ))
-}
+})
 
 
 
@@ -127,7 +128,7 @@ const App = () => {
     setSearchTerm(newTerm)
   }
 
-  const handleRemoveStory = async (objectID: number) => {
+  const handleRemoveStory = useCallback(async (objectID: number) => {
     try {
       dispatchStories({ type: 'DELETE_STORY_START', payload: 'Deleting Story and refreshing' })
       const { data: { stories: newStories } } = await deleteAsyncStories(objectID, stories)
@@ -138,13 +139,13 @@ const App = () => {
         dispatchStories({ type: 'CLEAR_ERROR', payload: undefined })
       }, 2000)
     }
-  }
+  }, [stories])
 
-  const handleEditClicked = (objectIDToEdit: number) => {
+  const handleEditClicked = useCallback((objectIDToEdit: number) => {
     const story = stories.find(({ objectID }) => objectID == objectIDToEdit)
     if (!story) return;
     dispatchStories({ type: 'EDIT_STORY_START', payload: story })
-  }
+  }, [stories])
 
   const handleAddClicked = () => {
     dispatchStories({ type: 'ADD_STORY_START', payload: undefined })
@@ -181,6 +182,8 @@ const App = () => {
     setTriggerCount((count: number) => count + 1)
     event.preventDefault();
   }
+
+  console.log('B:App')
 
   return (
     <div className="app-container">
