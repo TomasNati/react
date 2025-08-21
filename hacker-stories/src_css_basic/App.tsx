@@ -39,10 +39,10 @@ const useStorageState = (key: string, initialValue: StorageValueType, isMounted:
 
   useEffect(() => {
     if (!isMounted.current) {
-        isMounted.current = true;
+      isMounted.current = true;
     } else {
-        localStorage.setItem(key, value)
-        console.log(`%cuseStorageState changed to: ${value}`, 'font-weight: bold; color: green;')
+      localStorage.setItem(key, value)
+      console.log(`%cuseStorageState changed to: ${value}`, 'font-weight: bold; color: green;')
     }
   }, [value, key, isMounted])
 
@@ -52,13 +52,13 @@ const useStorageState = (key: string, initialValue: StorageValueType, isMounted:
 const ItemList = ({ url, title, author, num_comments, points, onRemoveClicked, onEditClicked }: ItemListProps) => {
   return (
     <li className='item'>
-      <span style={{width: '35%'}}><a href={url} target="_blank">{title}</a></span>
-      <span style={{width: '25%'}}><p>Authors: {author}</p></span>
-      <span style={{width: '15%'}}><p>Number of comments: {num_comments}</p></span>
-      <span style={{width: '15%'}}><p>Points: {points}</p></span>
-      <span style={{width: '10%'}}>
+      <span style={{ width: '35%' }}><a href={url} target="_blank">{title}</a></span>
+      <span style={{ width: '25%' }}><p>Authors: {author}</p></span>
+      <span style={{ width: '15%' }}><p>Number of comments: {num_comments}</p></span>
+      <span style={{ width: '15%' }}><p>Points: {points}</p></span>
+      <span style={{ width: '10%' }}>
         <button onClick={onRemoveClicked}>
-            <Check height="18px" width="18px" />
+          <Check height="18px" width="18px" />
         </button>
         <button onClick={onEditClicked}>Edit</button>
       </span>
@@ -89,17 +89,17 @@ const List = React.memo(({ list, onRemoveClicked, onEditClicked }: ListProps) =>
 
 
 const getSumComments = (stories: Stories[]) => {
-    console.log('C');
-    return stories.reduce(
-        (result, value) => result + value.num_comments,
-        0
-    );
+  console.log('C: getSumComments');
+  return stories.reduce(
+    (result, value) => result + value.num_comments,
+    0
+  );
 };
 
 const App = () => {
   const isMounted = useRef(false)
   const [searchTerm, setSearchTerm] = useStorageState(searchKey, "React", isMounted)
-  
+
   const [triggerCount, setTriggerCount] = useState(0)
   const [usarApiFake, setUsarApiFake] = useState(false)
   const [storiesState, dispatchStories] = useReducer(storiesReducer, {
@@ -132,9 +132,9 @@ const App = () => {
     fetchStories()
   }, [fetchStories])
 
-  const handleSearchTermChanged = (newTerm: string) => {
+  const handleSearchTermChanged = useCallback((newTerm: string) => {
     setSearchTerm(newTerm)
-  }
+  }, []);
 
   const handleRemoveStory = useCallback(async (objectID: number) => {
     try {
@@ -186,12 +186,12 @@ const App = () => {
     dispatchStories({ type: 'CLOSE_STORY_FORM', payload: undefined })
   }
 
-  const handleTriggerSearch = (event: FormEvent) => {
+  const handleTriggerSearch = useCallback((event: FormEvent) => {
     setTriggerCount((count: number) => count + 1)
     event.preventDefault();
-  }
+  }, []);
 
-   const sumComments = useMemo(() => getSumComments(stories), [stories]);
+  const sumComments = useMemo(() => getSumComments(stories), [stories]);
 
   console.log('B:App')
 

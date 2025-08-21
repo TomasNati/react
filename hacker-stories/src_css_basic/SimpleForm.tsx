@@ -4,7 +4,8 @@ import {
     type FocusEvent,
     type ChangeEvent,
     type FormEvent,
-    type HTMLInputTypeAttribute
+    type HTMLInputTypeAttribute,
+    memo
 } from "react"
 
 interface InputWithLabelProps {
@@ -55,8 +56,8 @@ interface SimpleFormProps {
     handleSearchTermChanged: (newTerm: string) => void;
     searchTerm: string;
 }
-export const SimpleForm = ({ handleTriggerSearch, handleSearchTermChanged, searchTerm }: SimpleFormProps) => {
-
+export const SimpleForm = memo(({ handleTriggerSearch, handleSearchTermChanged, searchTerm }: SimpleFormProps) => {
+    console.log('D: SimpleForm')
     return (
         <form onSubmit={handleTriggerSearch} className="search-form">
             <InputWithLabel
@@ -76,4 +77,4 @@ export const SimpleForm = ({ handleTriggerSearch, handleSearchTermChanged, searc
             </div>
         </form>
     )
-}
+});
