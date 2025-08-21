@@ -7,7 +7,8 @@ import {
   useCallback,
   type FormEvent,
   useRef,
-  RefObject
+  RefObject,
+  useMemo
 } from 'react'
 import './App.css'
 import { addAsyncStory, deleteAsyncStories, editAsyncStory, getAsyncStories as fakeGetAsyncStories } from './api-fake';
@@ -87,6 +88,13 @@ const List = React.memo(({ list, onRemoveClicked, onEditClicked }: ListProps) =>
 })
 
 
+const getSumComments = (stories: Stories[]) => {
+    console.log('C');
+    return stories.reduce(
+        (result, value) => result + value.num_comments,
+        0
+    );
+};
 
 const App = () => {
   const isMounted = useRef(false)
@@ -183,11 +191,13 @@ const App = () => {
     event.preventDefault();
   }
 
+   const sumComments = useMemo(() => getSumComments(stories), [stories]);
+
   console.log('B:App')
 
   return (
     <div className="app-container">
-      <h1>My Hacker Stories 2</h1>
+      <h1>My Hacker Stories 2 with {sumComments} comments</h1>
       <SimpleForm
         handleTriggerSearch={handleTriggerSearch}
         handleSearchTermChanged={handleSearchTermChanged}
