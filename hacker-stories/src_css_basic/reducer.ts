@@ -15,7 +15,7 @@ type ACTION_TYPE =
     'CLEAR_ERROR' |
     'CLOSE_STORY_FORM'
 
-interface StoriesState {
+export interface StoriesState {
     stories: Stories[];
     asyncMessage: string;
     storyToEdit: Stories | undefined;

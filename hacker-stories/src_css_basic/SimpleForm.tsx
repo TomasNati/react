@@ -16,7 +16,7 @@ interface InputWithLabelProps {
     onValueChanged: (term: string) => void
     children?: React.ReactNode;
 }
-const InputWithLabel = ({ id, value, type, onValueChanged, children, autofocus }: InputWithLabelProps) => {
+export const InputWithLabel = ({ id, value, type, onValueChanged, children, autofocus }: InputWithLabelProps) => {
 
     const inputRef = useRef<HTMLInputElement>(null)
 

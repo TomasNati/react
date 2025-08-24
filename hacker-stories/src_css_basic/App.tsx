@@ -49,7 +49,7 @@ const useStorageState = (key: string, initialValue: StorageValueType, isMounted:
   return [value, setValue]
 }
 
-const ItemList = ({ url, title, author, num_comments, points, onRemoveClicked, onEditClicked }: ItemListProps) => {
+export const ItemList = ({ url, title, author, num_comments, points, onRemoveClicked, onEditClicked }: ItemListProps) => {
   return (
     <li className='item'>
       <span style={{ width: '35%' }}><a href={url} target="_blank">{title}</a></span>
@@ -73,7 +73,7 @@ interface ListProps {
   onRemoveClicked: (objectID: number) => void
   onEditClicked: (objectID: number) => void;
 }
-const List = React.memo(({ list, onRemoveClicked, onEditClicked }: ListProps) => {
+export const List = React.memo(({ list, onRemoveClicked, onEditClicked }: ListProps) => {
   // rest operator on the left, {objectID,...item}, destructure objectID current element in the list, 
   //   assigning the rest of the properties to a new object, 'item'.
   // spread operator on the right, ...item, creates key=value pairs for each operator in item object
