@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import App, { List, ItemList } from "./App";
 import { storiesReducer, StoriesState } from "./reducer";
-import { SimpleForm, InputWithLabel } from "./SimpleForm";
+import { SimpleForm, InputWithLabel, SimpleFormProps } from "./SimpleForm";
 import { Stories } from "./api";
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
@@ -73,7 +73,6 @@ describe('ItemList', ()=> {
         render(<ItemList {...stories[0]} onEditClicked={() => {}} onRemoveClicked={() => {}} />)
         expect(screen.getByText('Authors: Jordan Walke')).toBeInTheDocument();
         expect(screen.getByText('React')).toHaveAttribute('href', 'http://reactjs.org/')
-        screen.debug();
     });
 
     it('render clickable butons', () => {
@@ -87,5 +86,32 @@ describe('ItemList', ()=> {
         const dismissButton = screen.getByRole('button', {name: ''});
         fireEvent.click(dismissButton);
         expect(handleRemoveButton).toHaveBeenCalledTimes(1);
+    })
+})
+
+describe('SimpleForm', () => {
+    const simpleFormProps: SimpleFormProps = {
+        handleSearchTermChanged: vi.fn(),
+        handleTriggerSearch: vi.fn(),
+        searchTerm: 'React'
+    }
+
+    it('render all properties', () => {
+        render(<SimpleForm {...simpleFormProps} />);
+        expect(screen.getByDisplayValue('React')).toBeInTheDocument();
+        expect(screen.getByLabelText(/Search/)).toBeInTheDocument();
+    })
+
+    it('calls handleSearchTermChanged on input field change', () => {
+        render(<SimpleForm {...simpleFormProps} />);
+        fireEvent.change(screen.getByLabelText(/Search/), { target: {value: 'Redux'}});
+        expect(simpleFormProps.handleSearchTermChanged).toHaveBeenCalledTimes(1);
+        expect(simpleFormProps.handleSearchTermChanged).toHaveBeenCalledWith('Redux');
+    })
+
+    it('calls handleTriggerSearch on submit', () => {
+        render(<SimpleForm {...simpleFormProps} />);
+        fireEvent.submit(screen.getByRole('button'));
+        expect(simpleFormProps.handleTriggerSearch).toHaveBeenCalledTimes(1);
     })
 })
