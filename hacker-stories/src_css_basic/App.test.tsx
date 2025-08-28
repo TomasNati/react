@@ -1,8 +1,9 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import App, { List, ItemList } from "./App";
 import { storiesReducer, StoriesState } from "./reducer";
 import { SimpleForm, InputWithLabel } from "./SimpleForm";
 import { Stories } from "./api";
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 const stories: Stories[] = [
     {
@@ -64,5 +65,27 @@ describe('storiesReducer', () => {
 
         expect(newState.stories).toEqual(stories);
         expect(newState.asyncMessage).toBe('')
+    })
+})
+
+describe('ItemList', ()=> {
+    it('render all properties', ()=> {
+        render(<ItemList {...stories[0]} onEditClicked={() => {}} onRemoveClicked={() => {}} />)
+        expect(screen.getByText('Authors: Jordan Walke')).toBeInTheDocument();
+        expect(screen.getByText('React')).toHaveAttribute('href', 'http://reactjs.org/')
+        screen.debug();
+    });
+
+    it('render clickable butons', () => {
+        render(<ItemList {...stories[0]} onEditClicked={() => {}} onRemoveClicked={() => {}} />)
+        expect(screen.getAllByRole('button')).toHaveLength(2);
+    })
+
+    it('clicking the Dismiss button calls the callback handler', () =>{
+        const handleRemoveButton = vi.fn();
+        render(<ItemList {...stories[0]} onEditClicked={() => {}} onRemoveClicked={handleRemoveButton} />)
+        const dismissButton = screen.getByRole('button', {name: ''});
+        fireEvent.click(dismissButton);
+        expect(handleRemoveButton).toHaveBeenCalledTimes(1);
     })
 })
