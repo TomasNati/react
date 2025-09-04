@@ -25,15 +25,20 @@ export const getAsyncStories = (query: string): Promise<StoriesUI> => {
   const getUrl = `${BASE_URL}search?query=${query}`;
   return new Promise((resolve, reject) => {
     const asyncFetch = async () => {
-      const response = await axios.get<StoriesResponse>(getUrl)
-      if (response.status == 200) {
-        resolve({
-          data: {
-            stories: response.data.hits,
-          },
-        });
-      } else {
-        reject(`Invalid response: ${response.status}`);
+      try {
+        const response = await axios.get<StoriesResponse>(getUrl)
+        if (response.status == 200) {
+          resolve({
+            data: {
+              stories: response.data.hits,
+            },
+          });
+        } else {
+          reject(`Invalid response: ${response.status}`);
+        }
+      }
+      catch (error) {
+        reject('Unexpected error')
       }
     };
 

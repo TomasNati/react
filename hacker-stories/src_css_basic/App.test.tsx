@@ -2,8 +2,11 @@ import { describe, it, expect, vi } from "vitest";
 import App, { List, ItemList } from "./App";
 import { storiesReducer, StoriesState } from "./reducer";
 import { SimpleForm, InputWithLabel, SimpleFormProps } from "./SimpleForm";
-import { Stories } from "./api";
+import { Stories, StoriesUI } from "./api";
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import axios from "axios";
+
+vi.mock('axios')
 
 const stories: Stories[] = [
     {
@@ -68,22 +71,22 @@ describe('storiesReducer', () => {
     })
 })
 
-describe('ItemList', ()=> {
-    it('render all properties', ()=> {
-        render(<ItemList {...stories[0]} onEditClicked={() => {}} onRemoveClicked={() => {}} />)
+describe('ItemList', () => {
+    it('render all properties', () => {
+        render(<ItemList {...stories[0]} onEditClicked={() => { }} onRemoveClicked={() => { }} />)
         expect(screen.getByText('Authors: Jordan Walke')).toBeInTheDocument();
         expect(screen.getByText('React')).toHaveAttribute('href', 'http://reactjs.org/')
     });
 
     it('render clickable butons', () => {
-        render(<ItemList {...stories[0]} onEditClicked={() => {}} onRemoveClicked={() => {}} />)
+        render(<ItemList {...stories[0]} onEditClicked={() => { }} onRemoveClicked={() => { }} />)
         expect(screen.getAllByRole('button')).toHaveLength(2);
     })
 
-    it('clicking the Dismiss button calls the callback handler', () =>{
+    it('clicking the Dismiss button calls the callback handler', () => {
         const handleRemoveButton = vi.fn();
-        render(<ItemList {...stories[0]} onEditClicked={() => {}} onRemoveClicked={handleRemoveButton} />)
-        const dismissButton = screen.getByRole('button', {name: ''});
+        render(<ItemList {...stories[0]} onEditClicked={() => { }} onRemoveClicked={handleRemoveButton} />)
+        const dismissButton = screen.getByRole('button', { name: '' });
         fireEvent.click(dismissButton);
         expect(handleRemoveButton).toHaveBeenCalledTimes(1);
     })
@@ -104,7 +107,7 @@ describe('SimpleForm', () => {
 
     it('calls handleSearchTermChanged on input field change', () => {
         render(<SimpleForm {...simpleFormProps} />);
-        fireEvent.change(screen.getByLabelText(/Search/), { target: {value: 'Redux'}});
+        fireEvent.change(screen.getByLabelText(/Search/), { target: { value: 'Redux' } });
         expect(simpleFormProps.handleSearchTermChanged).toHaveBeenCalledTimes(1);
         expect(simpleFormProps.handleSearchTermChanged).toHaveBeenCalledWith('Redux');
     })
@@ -113,5 +116,61 @@ describe('SimpleForm', () => {
         render(<SimpleForm {...simpleFormProps} />);
         fireEvent.submit(screen.getByRole('button'));
         expect(simpleFormProps.handleTriggerSearch).toHaveBeenCalledTimes(1);
+    })
+})
+
+describe('App', () => {
+
+    it('succeeds fetching data', async () => {
+        const promise = Promise.resolve({
+            status: 200,
+            data: {
+                hits: stories
+            }
+        })
+
+        axios.get.mockImplementationOnce(() => promise);
+        render(<App />);
+        expect(screen.queryByText(/Loading/)).toBeInTheDocument()
+
+        await waitFor(async () => await promise);
+        expect(screen.queryByText(/Loading/)).toBeNull();
+        expect(screen.queryByText('React')).toBeInTheDocument();
+        expect(screen.queryByText('Redux')).toBeInTheDocument();
+        expect(screen.queryAllByText('Edit')).toHaveLength(2);
+    })
+
+    it('fails fetching data -', async () => {
+        const promise = Promise.resolve({
+            status: 500,
+            error: {
+                message: 'Internal server error found'
+            }
+        })
+
+        axios.get.mockImplementationOnce(() => promise);
+        render(<App />);
+        try {
+            await waitFor(async () => await promise);
+        } catch (error) {
+            expect(screen.queryByText(/There was an error/)).toBeInTheDocument();
+        }
+    })
+
+    it('fails fetching data - Unexpected axios error', async () => {
+        const promise = Promise.reject({
+            status: 500,
+            error: {
+                message: 'Internal server error found'
+            }
+        })
+
+        axios.get.mockImplementationOnce(() => promise);
+        render(<App />);
+        try {
+            await waitFor(async () => await promise);
+        } catch (error) {
+            expect(screen.queryByText(/There was an error/)).toBeInTheDocument();
+        }
     })
 })
