@@ -173,4 +173,76 @@ describe('App', () => {
             expect(screen.queryByText(/There was an error/)).toBeInTheDocument();
         }
     })
+
+    it('removes an item from the list', async () => {
+        const promise = Promise.resolve({
+            status: 200,
+            data: {
+                hits: stories
+            }
+        })
+
+        axios.get.mockImplementationOnce(() => promise);
+        render(<App />);
+
+        await waitFor(async () => await promise);
+        expect(screen.queryByText('React')).toBeInTheDocument();
+        const firstRemoveButton = screen.getAllByRole('button', { name: '' })[0]
+        fireEvent.click(firstRemoveButton)
+        expect(screen.queryByText('React')).not.toBeInTheDocument();
+    })
+
+    it('searches again when clickingn submit button', async () => {
+        const promiseInitialFetch = Promise.resolve({
+            status: 200,
+            data: {
+                hits: stories
+            }
+        })
+
+        const newStory: Stories = {
+            author: 'Andrés Asteasuain',
+            num_comments: 10,
+            objectID: 505,
+            points: 4,
+            title: 'Pruebas de Tests',
+            url: 'www.nba.com'
+        }
+
+        const promiseSecondFetch = Promise.resolve({
+            status: 200,
+            data: {
+                hits: [newStory]
+            }
+        })
+
+        axios.get.mockImplementation((url: string) => {
+            if (url.includes('React')) {
+                return promiseInitialFetch
+            } else if (url.includes('Andrés')) {
+                return promiseSecondFetch
+            }
+            throw Error('Invalid url to mock')
+        });
+        render(<App />);
+
+        await waitFor(async () => await promiseInitialFetch);
+        expect(screen.queryByText('React')).toBeInTheDocument();
+        expect(screen.queryByText('Redux')).toBeInTheDocument();
+        expect(screen.queryByText(/Pruebas/)).toBeNull();
+
+        const searchTermInput = screen.getByLabelText(/Search Term/)
+        fireEvent.change(searchTermInput, {
+            target: { value: 'Andrés Asteasuain' }
+        })
+
+        screen.debug(searchTermInput)
+
+        fireEvent.click(screen.getByRole('button', { name: 'Search' }))
+        await waitFor(async () => await promiseSecondFetch);
+        expect(screen.queryByText('React')).toBeNull();
+        expect(screen.queryByText('Redux')).toBeNull();
+        expect(screen.queryByText(/Pruebas/)).toBeInTheDocument();
+
+    })
 })
