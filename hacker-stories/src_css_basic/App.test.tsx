@@ -236,8 +236,6 @@ describe('App', () => {
             target: { value: 'Andrés Asteasuain' }
         })
 
-        screen.debug(searchTermInput)
-
         fireEvent.click(screen.getByRole('button', { name: 'Search' }))
         await waitFor(async () => await promiseSecondFetch);
         expect(screen.queryByText('React')).toBeNull();
