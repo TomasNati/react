@@ -16,22 +16,13 @@ import { type Stories, getAsyncStories } from './api';
 import { StoryForm } from './Form'
 import { storiesReducer } from './reducer';
 import { SimpleForm } from './SimpleForm'
-import Check from './check.svg?react';
 import React from 'react';
+import { List } from './List';
 
 const searchKey = 'search';
 
 type StorageValueType = string;
 
-interface ItemListProps {
-  url: string;
-  title: string;
-  author: string;
-  num_comments: number;
-  points: number;
-  onRemoveClicked: () => void;
-  onEditClicked: () => void;
-}
 
 const useStorageState = (key: string, initialValue: StorageValueType, isMounted: RefObject<boolean>):
   [StorageValueType, Dispatch<SetStateAction<StorageValueType>>] => {
@@ -48,44 +39,6 @@ const useStorageState = (key: string, initialValue: StorageValueType, isMounted:
 
   return [value, setValue]
 }
-
-export const ItemList = ({ url, title, author, num_comments, points, onRemoveClicked, onEditClicked }: ItemListProps) => {
-  return (
-    <li className='item'>
-      <span style={{ width: '35%' }}><a href={url} target="_blank">{title}</a></span>
-      <span style={{ width: '25%' }}><p>Authors: {author}</p></span>
-      <span style={{ width: '15%' }}><p>Number of comments: {num_comments}</p></span>
-      <span style={{ width: '15%' }}><p>Points: {points}</p></span>
-      <span style={{ width: '10%' }}>
-        <button onClick={onRemoveClicked}>
-          <Check height="18px" width="18px" />
-        </button>
-        <button onClick={onEditClicked}>Edit</button>
-      </span>
-      <br />
-      <br />
-    </li>
-  )
-}
-
-interface ListProps {
-  list: Stories[];
-  onRemoveClicked: (objectID: number) => void
-  onEditClicked: (objectID: number) => void;
-}
-export const List = React.memo(({ list, onRemoveClicked, onEditClicked }: ListProps) => {
-  // rest operator on the left, {objectID,...item}, destructure objectID current element in the list, 
-  //   assigning the rest of the properties to a new object, 'item'.
-  // spread operator on the right, ...item, creates key=value pairs for each operator in item object
-  console.log('B:List')
-  return list.map(({ objectID, ...item }) => (
-    <ItemList
-      onRemoveClicked={() => onRemoveClicked(objectID)}
-      onEditClicked={() => onEditClicked(objectID)}
-      {...item}
-    />
-  ))
-})
 
 
 const getSumComments = (stories: Stories[]) => {
