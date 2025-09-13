@@ -1,6 +1,7 @@
 import React from 'react';
 import { type Stories } from './api';
 import Check from './check.svg?react';
+import { type SortStatus } from './reducer';
 
 interface ItemListProps {
   url: string;
@@ -33,22 +34,28 @@ export const ItemList = ({ url, title, author, num_comments, points, onRemoveCli
 
 interface ListProps {
   list: Stories[];
+  sortStatus: SortStatus[];
   onRemoveClicked: (objectID: number) => void
   onEditClicked: (objectID: number) => void;
   onSort: (field: keyof Stories) => void;
 }
-export const List = React.memo(({ list, onRemoveClicked, onEditClicked, onSort }: ListProps) => {
+export const List = React.memo(({ list, sortStatus, onRemoveClicked, onEditClicked, onSort }: ListProps) => {
   // rest operator on the left, {objectID,...item}, destructure objectID current element in the list, 
   //   assigning the rest of the properties to a new object, 'item'.
   // spread operator on the right, ...item, creates key=value pairs for each operator in item object
 
+  const getColumnHeader = (column: keyof Stories) => {
+    const sortInfo = sortStatus.find(({ field }) => field === column)
+    return sortInfo?.ascending ? ' ↑' : sortInfo?.ascending === false ? ' ↓' : ''
+  }
+
   return (
     <ul>
       <li className='header'>
-        <span style={{ width: '40%' }}><p onClick={() => onSort('title')}>Title</p></span>
-        <span style={{ width: '23%' }}><p onClick={() => onSort('author')}>Authors</p></span>
-        <span style={{ width: '15%' }}><p onClick={() => onSort('num_comments')}>Number of comments</p></span>
-        <span style={{ width: '12%' }}><p onClick={() => onSort('points')}>Points</p></span>
+        <span style={{ width: '40%' }}><p onClick={() => onSort('title')}>{`Title ${getColumnHeader('title')}`}</p></span>
+        <span style={{ width: '23%' }}><p onClick={() => onSort('author')}>{`Authors ${getColumnHeader('author')}`}</p></span>
+        <span style={{ width: '15%' }}><p onClick={() => onSort('num_comments')}>{`Number of comments ${getColumnHeader('num_comments')}`}</p></span>
+        <span style={{ width: '12%' }}><p onClick={() => onSort('points')}>{`Points ${getColumnHeader('points')}`}</p></span>
         <span style={{ width: '10%' }} />
         <br />
         <br />

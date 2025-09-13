@@ -56,18 +56,19 @@ const App = () => {
   const [usarApiFake, setUsarApiFake] = useState(false)
   const [storiesState, dispatchStories] = useReducer(storiesReducer, {
     stories: [],
+    unsortedStories: [],
     asyncMessage: '',
     storyToEdit: undefined,
     showForm: false,
     sortStatus: [
-      { field: 'title', ascending: false },
-      { field: 'author', ascending: false },
-      { field: 'num_comments', ascending: false },
-      { field: 'points', ascending: false },
+      { field: 'title' },
+      { field: 'author' },
+      { field: 'num_comments' },
+      { field: 'points' },
     ]
   })
 
-  const { stories, asyncMessage, storyToEdit, showForm } = storiesState
+  const { stories, asyncMessage, storyToEdit, showForm, sortStatus } = storiesState
 
 
   const fetchStories = useCallback(async () => {
@@ -187,6 +188,7 @@ const App = () => {
           onRemoveClicked={handleRemoveStory}
           onEditClicked={handleEditClicked}
           onSort={handleSort}
+          sortStatus={sortStatus}
         />
       }
     </div>

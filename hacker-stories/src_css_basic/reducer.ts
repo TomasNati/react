@@ -19,6 +19,7 @@ type ACTION_TYPE =
 
 export interface StoriesState {
     stories: Stories[];
+    unsortedStories: Stories[];
     asyncMessage: string;
     storyToEdit: Stories | undefined;
     showForm: boolean;
@@ -27,7 +28,7 @@ export interface StoriesState {
 
 export interface SortStatus {
     field: keyof Stories;
-    ascending: boolean
+    ascending?: boolean
 }
 
 interface ReducerAction {
@@ -57,7 +58,8 @@ export const storiesReducer = (state: StoriesState, action: ReducerAction): Stor
             return {
                 ...state,
                 asyncMessage: '',
-                stories: action.payload as Stories[]
+                stories: action.payload as Stories[],
+                unsortedStories: action.payload as Stories[]
             };
         case 'SET_ERROR':
             return {
@@ -94,10 +96,13 @@ export const storiesReducer = (state: StoriesState, action: ReducerAction): Stor
             const sortField = action.payload as keyof Stories;
             const sortInfo = state.sortStatus.find(({ field }) => field === sortField);
 
-            if (!sortInfo) throw new Error(`Unknown sort field: ${sortField}`);;
+            if (!sortInfo) throw new Error(`Unknown sort field: ${sortField}`);
 
-            sortInfo.ascending = !sortInfo.ascending;
-            state.stories = sortStories(state.stories, sortInfo);
+            sortInfo.ascending = sortInfo.ascending === undefined
+                ? true
+                : sortInfo.ascending === true ? false : undefined;
+
+            state.stories = sortInfo.ascending === undefined ? state.unsortedStories : sortStories(state.stories, sortInfo);
 
             return {
                 ...state
