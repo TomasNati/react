@@ -1,4 +1,5 @@
 import type { Stories } from "./api";
+import { sortByKey } from './utils';
 
 type ACTION_TYPE =
     'FETCH_STORIES_START' |
@@ -13,18 +14,30 @@ type ACTION_TYPE =
     'ADD_STORY_COMPLETE' |
     'SET_ERROR' |
     'CLEAR_ERROR' |
-    'CLOSE_STORY_FORM'
+    'CLOSE_STORY_FORM' |
+    'SORT'
 
 export interface StoriesState {
     stories: Stories[];
     asyncMessage: string;
     storyToEdit: Stories | undefined;
-    showForm: boolean
+    showForm: boolean;
+    sortStatus: SortStatus[]
+}
+
+export interface SortStatus {
+    field: keyof Stories;
+    ascending: boolean
 }
 
 interface ReducerAction {
     type: ACTION_TYPE;
     payload: Stories[] | Stories | string | undefined;
+}
+
+const sortStories = (stories: Stories[], info: SortStatus): Stories[] => {
+    const sortedStories = sortByKey(stories, info.field, info.ascending)
+    return sortedStories;
 }
 
 export const storiesReducer = (state: StoriesState, action: ReducerAction): StoriesState => {
@@ -77,6 +90,19 @@ export const storiesReducer = (state: StoriesState, action: ReducerAction): Stor
                 storyToEdit: undefined,
                 showForm: false
             }
+        case 'SORT': {
+            const sortField = action.payload as keyof Stories;
+            const sortInfo = state.sortStatus.find(({ field }) => field === sortField);
+
+            if (!sortInfo) throw new Error(`Unknown sort field: ${sortField}`);;
+
+            sortInfo.ascending = !sortInfo.ascending;
+            state.stories = sortStories(state.stories, sortInfo);
+
+            return {
+                ...state
+            }
+        }
         default:
             throw new Error(`Unknown action type: ${action.type}`);
     }

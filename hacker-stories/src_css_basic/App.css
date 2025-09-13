@@ -6,11 +6,30 @@
   overflow-y: auto;
 }
 
-.item {
+.item,
+.header {
     display: flex;
     align-items: center;
     padding-bottom: 5px;
 }
+
+    .header > span {
+        padding: 0 5px;
+        white-space: nowrap;
+    }
+
+        .header > span > p {
+            padding: 0 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .header > span > p:hover {
+            text-decoration: underline;
+        }
 
     .item > span {
         padding: 0 5px;

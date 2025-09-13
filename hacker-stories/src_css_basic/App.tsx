@@ -16,7 +16,6 @@ import { type Stories, getAsyncStories } from './api';
 import { StoryForm } from './Form'
 import { storiesReducer } from './reducer';
 import { SimpleForm } from './SimpleForm'
-import React from 'react';
 import { List } from './List';
 
 const searchKey = 'search';
@@ -59,7 +58,13 @@ const App = () => {
     stories: [],
     asyncMessage: '',
     storyToEdit: undefined,
-    showForm: false
+    showForm: false,
+    sortStatus: [
+      { field: 'title', ascending: false },
+      { field: 'author', ascending: false },
+      { field: 'num_comments', ascending: false },
+      { field: 'points', ascending: false },
+    ]
   })
 
   const { stories, asyncMessage, storyToEdit, showForm } = storiesState
@@ -146,6 +151,10 @@ const App = () => {
 
   const sumComments = useMemo(() => getSumComments(stories), [stories]);
 
+  const handleSort = (field: keyof Stories) => {
+    dispatchStories({ type: 'SORT', payload: field })
+  }
+
   console.log('B:App')
 
   return (
@@ -173,9 +182,12 @@ const App = () => {
           </>) : null
       }
       {asyncMessage ? <p>{asyncMessage}</p>
-        : <ul>
-          <List list={stories} onRemoveClicked={handleRemoveStory} onEditClicked={handleEditClicked} />
-        </ul>
+        : <List
+          list={stories}
+          onRemoveClicked={handleRemoveStory}
+          onEditClicked={handleEditClicked}
+          onSort={handleSort}
+        />
       }
     </div>
   )

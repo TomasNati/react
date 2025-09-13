@@ -15,10 +15,10 @@ interface ItemListProps {
 export const ItemList = ({ url, title, author, num_comments, points, onRemoveClicked, onEditClicked }: ItemListProps) => {
   return (
     <li className='item'>
-      <span style={{ width: '35%' }}><a href={url} target="_blank">{title}</a></span>
-      <span style={{ width: '25%' }}><p>Authors: {author}</p></span>
-      <span style={{ width: '15%' }}><p>Number of comments: {num_comments}</p></span>
-      <span style={{ width: '15%' }}><p>Points: {points}</p></span>
+      <span style={{ width: '40%' }}><a href={url} target="_blank">{title}</a></span>
+      <span style={{ width: '23%' }}><p>{author}</p></span>
+      <span style={{ width: '15%' }}><p>{num_comments}</p></span>
+      <span style={{ width: '12%' }}><p>{points}</p></span>
       <span style={{ width: '10%' }}>
         <button onClick={onRemoveClicked}>
           <Check height="18px" width="18px" />
@@ -35,17 +35,31 @@ interface ListProps {
   list: Stories[];
   onRemoveClicked: (objectID: number) => void
   onEditClicked: (objectID: number) => void;
+  onSort: (field: keyof Stories) => void;
 }
-export const List = React.memo(({ list, onRemoveClicked, onEditClicked }: ListProps) => {
+export const List = React.memo(({ list, onRemoveClicked, onEditClicked, onSort }: ListProps) => {
   // rest operator on the left, {objectID,...item}, destructure objectID current element in the list, 
   //   assigning the rest of the properties to a new object, 'item'.
   // spread operator on the right, ...item, creates key=value pairs for each operator in item object
-  console.log('B:List')
-  return list.map(({ objectID, ...item }) => (
-    <ItemList
-      onRemoveClicked={() => onRemoveClicked(objectID)}
-      onEditClicked={() => onEditClicked(objectID)}
-      {...item}
-    />
-  ))
+
+  return (
+    <ul>
+      <li className='header'>
+        <span style={{ width: '40%' }}><p onClick={() => onSort('title')}>Title</p></span>
+        <span style={{ width: '23%' }}><p onClick={() => onSort('author')}>Authors</p></span>
+        <span style={{ width: '15%' }}><p onClick={() => onSort('num_comments')}>Number of comments</p></span>
+        <span style={{ width: '12%' }}><p onClick={() => onSort('points')}>Points</p></span>
+        <span style={{ width: '10%' }} />
+        <br />
+        <br />
+      </li>
+      {list.map(({ objectID, ...item }) => (
+        <ItemList
+          onRemoveClicked={() => onRemoveClicked(objectID)}
+          onEditClicked={() => onEditClicked(objectID)}
+          {...item}
+        />
+      ))}
+    </ul>
+  )
 })
