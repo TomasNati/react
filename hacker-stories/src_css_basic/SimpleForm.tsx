@@ -5,7 +5,8 @@ import {
     type ChangeEvent,
     type FormEvent,
     type HTMLInputTypeAttribute,
-    memo
+    memo,
+    useState
 } from "react"
 
 interface InputWithLabelProps {
@@ -57,24 +58,46 @@ interface SimpleFormProps {
     searchTerm: string;
 }
 export const SimpleForm = memo(({ handleTriggerSearch, handleSearchTermChanged, searchTerm }: SimpleFormProps) => {
-    console.log('D: SimpleForm')
+    const [lastTerms, setLastTerms] = useState<string[]>([searchTerm])
+
+    const onSubmitClicked = (event: FormEvent<Element>) => {
+        if (!lastTerms.includes(searchTerm) && searchTerm != '') {
+            let newSearchTerms = []
+            if (lastTerms.length == 0) {
+                newSearchTerms = [searchTerm]
+            } else if (lastTerms.length == 5) {
+                newSearchTerms = [...lastTerms.slice(1, lastTerms.length), searchTerm]
+            } else {
+                newSearchTerms = [...lastTerms, searchTerm]
+            }
+            setLastTerms(newSearchTerms);
+            console.log(newSearchTerms)
+        }
+        handleTriggerSearch(event)
+    }
+
     return (
-        <form onSubmit={handleTriggerSearch} className="search-form">
-            <InputWithLabel
-                id="search-term"
-                value={searchTerm}
-                type='text'
-                onValueChanged={handleSearchTermChanged}
-                autofocus
-            >
-                <strong>Search Term:</strong>
-            </InputWithLabel>
-            <div style={{
-                display: 'flex',
-                gap: 3
-            }}>
-                <button type='submit' disabled={!searchTerm} className="button button_large">Search</button>
+        <>
+            <form onSubmit={onSubmitClicked} className="search-form">
+                <InputWithLabel
+                    id="search-term"
+                    value={searchTerm}
+                    type='text'
+                    onValueChanged={handleSearchTermChanged}
+                    autofocus
+                >
+                    <strong>Search Term:</strong>
+                </InputWithLabel>
+                <div style={{
+                    display: 'flex',
+                    gap: 3
+                }}>
+                    <button type='submit' disabled={!searchTerm} className="button button_large">Search</button>
+                </div>
+            </form>
+            <div className="search-terms-bar">
+                {lastTerms.map(searchTerm => <button className='button'>{searchTerm}</button>)}
             </div>
-        </form>
+        </>
     )
 });

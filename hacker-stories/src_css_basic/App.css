@@ -94,7 +94,11 @@
     margin-right: 10px;
 }
 
-    .input:focus-visible,
-    .button:focus-visible {
-        outline: none;
-    }
+.input:focus-visible,
+.button:focus-visible {
+    outline: none;
+}
+
+.search-terms-bar > button {
+    margin: 5px
+}
