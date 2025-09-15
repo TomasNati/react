@@ -50,23 +50,26 @@ export const List = React.memo(({ list, sortStatus, onRemoveClicked, onEditClick
   }
 
   return (
-    <ul>
-      <li className='header'>
-        <span style={{ width: '40%' }}><p onClick={() => onSort('title')}>{`Title ${getColumnHeader('title')}`}</p></span>
-        <span style={{ width: '23%' }}><p onClick={() => onSort('author')}>{`Authors ${getColumnHeader('author')}`}</p></span>
-        <span style={{ width: '15%' }}><p onClick={() => onSort('num_comments')}>{`Number of comments ${getColumnHeader('num_comments')}`}</p></span>
-        <span style={{ width: '12%' }}><p onClick={() => onSort('points')}>{`Points ${getColumnHeader('points')}`}</p></span>
-        <span style={{ width: '10%' }} />
-        <br />
-        <br />
-      </li>
-      {list.map(({ objectID, ...item }) => (
-        <ItemList
-          onRemoveClicked={() => onRemoveClicked(objectID)}
-          onEditClicked={() => onEditClicked(objectID)}
-          {...item}
-        />
-      ))}
-    </ul>
+    <>
+        <div><button className='button'>Get more results</button></div>
+        <ul>
+            <li className='header'>
+                <span style={{ width: '40%' }}><p onClick={() => onSort('title')}>{`Title ${getColumnHeader('title')}`}</p></span>
+                <span style={{ width: '23%' }}><p onClick={() => onSort('author')}>{`Authors ${getColumnHeader('author')}`}</p></span>
+                <span style={{ width: '15%' }}><p onClick={() => onSort('num_comments')}>{`Number of comments ${getColumnHeader('num_comments')}`}</p></span>
+                <span style={{ width: '12%' }}><p onClick={() => onSort('points')}>{`Points ${getColumnHeader('points')}`}</p></span>
+                <span style={{ width: '10%' }} />
+                <br />
+                <br />
+            </li>
+            {list.map(({ objectID, ...item }) => (
+                <ItemList
+                onRemoveClicked={() => onRemoveClicked(objectID)}
+                onEditClicked={() => onEditClicked(objectID)}
+                {...item}
+                />
+            ))}
+        </ul>
+    </>
   )
 })

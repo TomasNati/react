@@ -12,13 +12,15 @@ export interface Stories {
 }
 
 export interface StoriesUI {
-  data: {
-    stories: Stories[];
-  };
+  data:  Stories[];
+  page: number;
+  totalPages: number;
 }
 
 export interface StoriesResponse {
   hits: Stories[];
+  page: number;
+  nbPages: number;
 }
 
 export const getAsyncStories = (query: string): Promise<StoriesUI> => {
@@ -29,9 +31,9 @@ export const getAsyncStories = (query: string): Promise<StoriesUI> => {
         const response = await axios.get<StoriesResponse>(getUrl)
         if (response.status == 200) {
           resolve({
-            data: {
-              stories: response.data.hits,
-            },
+            data: response.data.hits,
+            page: response.data.page,
+            totalPages: response.data.nbPages
           });
         } else {
           reject(`Invalid response: ${response.status}`);

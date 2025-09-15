@@ -1,4 +1,4 @@
-import type { Stories } from "./api";
+import type { Stories, StoriesUI } from "./api";
 import { sortByKey } from './utils';
 
 type ACTION_TYPE =
@@ -23,7 +23,9 @@ export interface StoriesState {
     asyncMessage: string;
     storyToEdit: Stories | undefined;
     showForm: boolean;
-    sortStatus: SortStatus[]
+    sortStatus: SortStatus[];
+    pageNumber: number;
+    pageTotal: number;
 }
 
 export interface SortStatus {
@@ -33,7 +35,7 @@ export interface SortStatus {
 
 interface ReducerAction {
     type: ACTION_TYPE;
-    payload: Stories[] | Stories | string | undefined;
+    payload: Stories[] | Stories | string | undefined | StoriesUI;
 }
 
 const sortStories = (stories: Stories[], info: SortStatus): Stories[] => {
@@ -51,7 +53,17 @@ export const storiesReducer = (state: StoriesState, action: ReducerAction): Stor
                 ...state,
                 asyncMessage: action.payload as string,
             }
-        case 'FETCH_STORIES_COMPLETE':
+        case 'FETCH_STORIES_COMPLETE': {
+            const result = action.payload as StoriesUI
+            return {
+                ...state,
+                asyncMessage: '',
+                stories: result.data,
+                unsortedStories: result.data,
+                pageNumber: result.page,
+                pageTotal: result.totalPages
+            };
+        }
         case 'DELETE_STORY_COMPLETE':
         case 'EDIT_STORY_COMPLETE':
         case 'ADD_STORY_COMPLETE':

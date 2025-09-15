@@ -60,6 +60,8 @@ const App = () => {
     asyncMessage: '',
     storyToEdit: undefined,
     showForm: false,
+    pageNumber: 0,
+    pageTotal: 0,
     sortStatus: [
       { field: 'title' },
       { field: 'author' },
@@ -68,7 +70,7 @@ const App = () => {
     ]
   })
 
-  const { stories, asyncMessage, storyToEdit, showForm, sortStatus } = storiesState
+  const { stories, asyncMessage, storyToEdit, showForm, sortStatus, pageNumber, pageTotal } = storiesState
 
 
   const fetchStories = useCallback(async () => {
@@ -76,7 +78,7 @@ const App = () => {
       if (searchTerm == '') return
       dispatchStories({ type: 'FETCH_STORIES_START', payload: 'Loading data...' })
       const result = usarApiFake ? await fakeGetAsyncStories() : await getAsyncStories(searchTerm)
-      dispatchStories({ type: 'FETCH_STORIES_COMPLETE', payload: result.data.stories })
+      dispatchStories({ type: 'FETCH_STORIES_COMPLETE', payload: result })
     } catch (error: unknown) {
       console.error('Error fetching stories:', error)
       dispatchStories({ type: 'SET_ERROR', payload: 'There was an error fetching the stories' })
@@ -98,7 +100,7 @@ const App = () => {
   const handleRemoveStory = useCallback(async (objectID: number) => {
     try {
       dispatchStories({ type: 'DELETE_STORY_START', payload: 'Deleting Story and refreshing' })
-      const { data: { stories: newStories } } = await deleteAsyncStories(objectID, stories)
+      const { data: newStories } = await deleteAsyncStories(objectID, stories)
       dispatchStories({ type: 'DELETE_STORY_COMPLETE', payload: newStories })
     } catch {
       dispatchStories({ type: 'SET_ERROR', payload: 'There was an error deleting the story' })
@@ -124,7 +126,7 @@ const App = () => {
         type: isAdd ? 'ADD_STORY_PROCESSING' : 'EDIT_STORY_PROCESSING',
         payload: `${isAdd ? 'Adding' : 'Updating'} Story and refreshing`
       })
-      const { data: { stories: newStories } } = isAdd
+      const { data: newStories } = isAdd
         ? await addAsyncStory(story, stories)
         : await editAsyncStory(story, stories)
       dispatchStories({

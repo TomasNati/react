@@ -104,6 +104,7 @@ export const SimpleForm = memo(({ handleTriggerSearch, handleSearchTermChanged, 
                 </div>
             </form>
             <div className="search-terms-bar">
+                <p>Last searches: </p>
                 {allSearchesButLast.map(searchTerm => 
                     <button 
                         className='button' 

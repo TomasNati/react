@@ -99,6 +99,9 @@
     outline: none;
 }
 
-.search-terms-bar > button {
-    margin: 5px
+.search-terms-bar {
+    display: flex;
 }
+    .search-terms-bar > button {
+        margin: 5px;
+    }

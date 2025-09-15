@@ -41,9 +41,7 @@ export const deleteAsyncStories = (objectIDToDelete: number, currentStories: Sto
             } else {
                 const stories = currentStories.filter(({ objectID }) => objectID != objectIDToDelete)
                 resolve({
-                    data: {
-                        stories
-                    }
+                    data: stories
                 })
             }
         }, 1000)
@@ -61,9 +59,7 @@ export const editAsyncStory = (story: Stories, currentStories: Stories[]): Promi
                     newStories.push(curStory.objectID == story.objectID ? story : curStory)
                 });
                 resolve({
-                    data: {
-                        stories: newStories
-                    }
+                    data: newStories
                 })
             }
         }, 1000)
@@ -77,9 +73,7 @@ export const addAsyncStory = (story: Stories, currentStories: Stories[]): Promis
                 reject(`Story with ID: ${story.objectID} is already present in the collection`)
             } else {
                 resolve({
-                    data: {
-                        stories: [...currentStories, story]
-                    }
+                    data: [...currentStories, story]
                 })
             }
         }, 1000)
