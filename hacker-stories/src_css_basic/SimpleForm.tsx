@@ -53,7 +53,7 @@ export const InputWithLabel = ({ id, value, type, onValueChanged, children, auto
 }
 
 interface SimpleFormProps {
-    handleTriggerSearch: (event: FormEvent) => void;
+    handleTriggerSearch: () => void;
     handleSearchTermChanged: (newTerm: string) => void;
     searchTerm: string;
 }
@@ -61,6 +61,7 @@ export const SimpleForm = memo(({ handleTriggerSearch, handleSearchTermChanged, 
     const [lastTerms, setLastTerms] = useState<string[]>([searchTerm])
 
     const onSubmitClicked = (event: FormEvent<Element>) => {
+        event.preventDefault();
         if (!lastTerms.includes(searchTerm) && searchTerm != '') {
             let newSearchTerms = []
             if (lastTerms.length == 0) {
@@ -73,7 +74,12 @@ export const SimpleForm = memo(({ handleTriggerSearch, handleSearchTermChanged, 
             setLastTerms(newSearchTerms);
             console.log(newSearchTerms)
         }
-        handleTriggerSearch(event)
+        handleTriggerSearch()
+    }
+
+    const onLastSearchClicked = (searchTermClicked: string) => {
+        handleSearchTermChanged(searchTermClicked)
+        handleTriggerSearch()
     }
 
     return (
@@ -96,7 +102,13 @@ export const SimpleForm = memo(({ handleTriggerSearch, handleSearchTermChanged, 
                 </div>
             </form>
             <div className="search-terms-bar">
-                {lastTerms.map(searchTerm => <button className='button'>{searchTerm}</button>)}
+                {lastTerms.map(searchTerm => 
+                    <button 
+                        className='button' 
+                        onClick={()=> onLastSearchClicked(searchTerm)}
+                    >
+                        {searchTerm}
+                    </button>)}
             </div>
         </>
     )

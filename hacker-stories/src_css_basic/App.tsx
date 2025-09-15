@@ -145,9 +145,8 @@ const App = () => {
     dispatchStories({ type: 'CLOSE_STORY_FORM', payload: undefined })
   }
 
-  const handleTriggerSearch = useCallback((event: FormEvent) => {
+  const handleTriggerSearch = useCallback(() => {
     setTriggerCount((count: number) => count + 1)
-    event.preventDefault();
   }, []);
 
   const sumComments = useMemo(() => getSumComments(stories), [stories]);
