@@ -82,6 +82,8 @@ export const SimpleForm = memo(({ handleTriggerSearch, handleSearchTermChanged, 
         handleTriggerSearch()
     }
 
+    const allSearchesButLast = lastTerms.filter(term => term !== searchTerm);
+
     return (
         <>
             <form onSubmit={onSubmitClicked} className="search-form">
@@ -102,7 +104,7 @@ export const SimpleForm = memo(({ handleTriggerSearch, handleSearchTermChanged, 
                 </div>
             </form>
             <div className="search-terms-bar">
-                {lastTerms.map(searchTerm => 
+                {allSearchesButLast.map(searchTerm => 
                     <button 
                         className='button' 
                         onClick={()=> onLastSearchClicked(searchTerm)}
