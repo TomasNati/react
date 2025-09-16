@@ -35,11 +35,20 @@ export const ItemList = ({ url, title, author, num_comments, points, onRemoveCli
 interface ListProps {
   list: Stories[];
   sortStatus: SortStatus[];
+  showGetMoreResultsButton: boolean;
   onRemoveClicked: (objectID: number) => void
   onEditClicked: (objectID: number) => void;
   onSort: (field: keyof Stories) => void;
+  onGetMoreResultsClicked: () => void;
 }
-export const List = React.memo(({ list, sortStatus, onRemoveClicked, onEditClicked, onSort }: ListProps) => {
+export const List = React.memo(({ 
+    list, 
+    sortStatus,
+    showGetMoreResultsButton, 
+    onRemoveClicked, 
+    onEditClicked, 
+    onSort,
+    onGetMoreResultsClicked }: ListProps) => {
   // rest operator on the left, {objectID,...item}, destructure objectID current element in the list, 
   //   assigning the rest of the properties to a new object, 'item'.
   // spread operator on the right, ...item, creates key=value pairs for each operator in item object
@@ -51,7 +60,10 @@ export const List = React.memo(({ list, sortStatus, onRemoveClicked, onEditClick
 
   return (
     <>
-        <div><button className='button'>Get more results</button></div>
+        {showGetMoreResultsButton ? (
+            <div>
+                <button className='button' onClick={onGetMoreResultsClicked}>Get more results</button>
+            </div>) : null }
         <ul>
             <li className='header'>
                 <span style={{ width: '40%' }}><p onClick={() => onSort('title')}>{`Title ${getColumnHeader('title')}`}</p></span>

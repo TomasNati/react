@@ -9,6 +9,7 @@ export interface Stories {
   num_comments: number;
   points: number;
   objectID: number;
+  [field:string] : string | number
 }
 
 export interface StoriesUI {
@@ -23,8 +24,8 @@ export interface StoriesResponse {
   nbPages: number;
 }
 
-export const getAsyncStories = (query: string): Promise<StoriesUI> => {
-  const getUrl = `${BASE_URL}search?query=${query}`;
+export const getAsyncStories = (queryTerm: string, pageNumber: number): Promise<StoriesUI> => {
+  const getUrl = `${BASE_URL}search?query=${queryTerm}&page=${pageNumber}`;
   return new Promise((resolve, reject) => {
     const asyncFetch = async () => {
       try {

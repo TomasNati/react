@@ -51,6 +51,8 @@ const getSumComments = (stories: Stories[]) => {
 const App = () => {
   const isMounted = useRef(false)
   const [searchTerm, setSearchTerm] = useStorageState(searchKey, "React", isMounted)
+  const [currentPageNumber, setCurrentPageNumber] = useState(0)
+  const [currentPageTotal, setCurrentPageTotal] = useState(0)
 
   const [triggerCount, setTriggerCount] = useState(0)
   const [usarApiFake, setUsarApiFake] = useState(false)
@@ -60,8 +62,6 @@ const App = () => {
     asyncMessage: '',
     storyToEdit: undefined,
     showForm: false,
-    pageNumber: 0,
-    pageTotal: 0,
     sortStatus: [
       { field: 'title' },
       { field: 'author' },
@@ -77,7 +77,8 @@ const App = () => {
     try {
       if (searchTerm == '') return
       dispatchStories({ type: 'FETCH_STORIES_START', payload: 'Loading data...' })
-      const result = usarApiFake ? await fakeGetAsyncStories() : await getAsyncStories(searchTerm)
+      const result = usarApiFake ? await fakeGetAsyncStories() : await getAsyncStories(searchTerm, currentPageNumber)
+      setCurrentPageTotal(result.totalPages)
       dispatchStories({ type: 'FETCH_STORIES_COMPLETE', payload: result })
     } catch (error: unknown) {
       console.error('Error fetching stories:', error)
@@ -148,16 +149,21 @@ const App = () => {
   }
 
   const handleTriggerSearch = useCallback(() => {
+    setCurrentPageNumber(0)
     setTriggerCount((count: number) => count + 1)
   }, []);
 
+  const handleGetMoreResultsClicked = () => {   
+    setCurrentPageNumber(currentPageNumber + 1)
+    setTriggerCount((count: number) => count + 1)
+  }
+
   const sumComments = useMemo(() => getSumComments(stories), [stories]);
+  const showGetMoreResultsButton = currentPageNumber < currentPageTotal + 1
 
   const handleSort = (field: keyof Stories) => {
     dispatchStories({ type: 'SORT', payload: field })
   }
-
-  console.log('B:App')
 
   return (
     <div className="app-container">
@@ -189,7 +195,9 @@ const App = () => {
           onRemoveClicked={handleRemoveStory}
           onEditClicked={handleEditClicked}
           onSort={handleSort}
+          onGetMoreResultsClicked={handleGetMoreResultsClicked}
           sortStatus={sortStatus}
+          showGetMoreResultsButton={showGetMoreResultsButton}
         />
       }
     </div>

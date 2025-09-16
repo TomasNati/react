@@ -24,8 +24,6 @@ export interface StoriesState {
     storyToEdit: Stories | undefined;
     showForm: boolean;
     sortStatus: SortStatus[];
-    pageNumber: number;
-    pageTotal: number;
 }
 
 export interface SortStatus {
@@ -35,12 +33,16 @@ export interface SortStatus {
 
 interface ReducerAction {
     type: ACTION_TYPE;
-    payload: Stories[] | Stories | string | undefined | StoriesUI;
+    payload: Stories[] | Stories | string | undefined | StoriesUI | number;
 }
 
-const sortStories = (stories: Stories[], info: SortStatus): Stories[] => {
-    const sortedStories = sortByKey(stories, info.field, info.ascending)
-    return sortedStories;
+const sortStories = (stories: Stories[], sortStatuses: SortStatus[]): Stories[] => {
+    const sortInfo = sortStatuses.find(({ascending}) => ascending !== undefined)
+    if (sortInfo) {
+        return sortByKey<Stories>(stories, sortInfo.field, sortInfo.ascending)
+    } else {
+        return stories
+    }
 }
 
 export const storiesReducer = (state: StoriesState, action: ReducerAction): StoriesState => {
@@ -55,13 +57,12 @@ export const storiesReducer = (state: StoriesState, action: ReducerAction): Stor
             }
         case 'FETCH_STORIES_COMPLETE': {
             const result = action.payload as StoriesUI
+            const newStories = result.page === 0 ? result.data : [...state.stories, ...result.data]
             return {
                 ...state,
                 asyncMessage: '',
-                stories: result.data,
-                unsortedStories: result.data,
-                pageNumber: result.page,
-                pageTotal: result.totalPages
+                stories: sortStories(newStories, state.sortStatus),
+                unsortedStories: newStories,
             };
         }
         case 'DELETE_STORY_COMPLETE':
@@ -114,7 +115,13 @@ export const storiesReducer = (state: StoriesState, action: ReducerAction): Stor
                 ? true
                 : sortInfo.ascending === true ? false : undefined;
 
-            state.stories = sortInfo.ascending === undefined ? state.unsortedStories : sortStories(state.stories, sortInfo);
+            state.sortStatus.forEach((sortInfo) => {
+                if (sortInfo.field !== sortField) {
+                    sortInfo.ascending = undefined
+                }
+            })
+
+            state.stories = sortStories(state.unsortedStories, state.sortStatus);
 
             return {
                 ...state
