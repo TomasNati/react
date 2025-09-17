@@ -22,6 +22,7 @@ export interface StoriesResponse {
   hits: Stories[];
   page: number;
   nbPages: number;
+  hitsPerPage: number;
 }
 
 export const getAsyncStories = (queryTerm: string, pageNumber: number): Promise<StoriesUI> => {
