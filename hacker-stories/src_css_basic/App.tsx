@@ -5,7 +5,6 @@ import {
   type SetStateAction,
   useReducer,
   useCallback,
-  type FormEvent,
   useRef,
   RefObject,
   useMemo
@@ -70,7 +69,7 @@ const App = () => {
     ]
   })
 
-  const { stories, asyncMessage, storyToEdit, showForm, sortStatus, pageNumber, pageTotal } = storiesState
+  const { stories, asyncMessage, storyToEdit, showForm, sortStatus } = storiesState
 
 
   const fetchStories = useCallback(async () => {
@@ -191,14 +190,17 @@ const App = () => {
       }
       {asyncMessage ? <p>{asyncMessage}</p>
         : <List
-          list={stories}
-          onRemoveClicked={handleRemoveStory}
-          onEditClicked={handleEditClicked}
-          onSort={handleSort}
-          onGetMoreResultsClicked={handleGetMoreResultsClicked}
-          sortStatus={sortStatus}
-          showGetMoreResultsButton={showGetMoreResultsButton}
-        />
+            list={stories}
+            onRemoveClicked={handleRemoveStory}
+            onEditClicked={handleEditClicked}
+            onSort={handleSort}
+            onGetMoreResultsClicked={handleGetMoreResultsClicked}
+            sortStatus={sortStatus}
+            showGetMoreResultsButton={showGetMoreResultsButton}
+            currentPage={currentPageNumber}
+            totalPages={currentPageTotal}
+            pagerSize={5}
+          />
       }
     </div>
   )

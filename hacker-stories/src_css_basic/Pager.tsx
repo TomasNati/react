@@ -1,46 +1,53 @@
 interface PagerProps {
     currentPage: number;
-    itemsPerPage: number;
+    pagerSize: number;
     totalPages: number;
     onPageChange: (newPage: number) => void;
 }
-export const Pager = ({ currentPage, itemsPerPage, totalPages, onPageChange }: PagerProps) => {
-    const firstPage = currentPage - 2 < 1 ? 1 : currentPage - 2;
-    const nextPage = currentPage + 2 > totalPages ? totalPages : currentPage + 2
+export const Pager = ({ currentPage, pagerSize, totalPages, onPageChange }: PagerProps) => {
 
-    /*
-
-        
-    const showPages = (currentPage: number, totalPages: number) => {
-        const firstPage = currentPage - 2 < 1 ? 1 : currentPage - 2;
-        const lastPage = currentPage + 2 > totalPages ? totalPages : currentPage + 2;
-
-        let pagesString = ``
-        let page = firstPage;
-        for (let i: number = 1; i <= 5; i++) {
-            if (i > lastPage) break;
-            pagesString += ` ${page} -`;
-            page++;
-        }
-        console.log(pagesString)
+    const getDefaultPagesLeftAndRight = (pagerSize: number) => {
+        const floor = Math.floor(pagerSize/2);
+        const ceil = Math.ceil(pagerSize/2);
+        return [floor, ceil - 1] 
     }
 
-    showPages(1, 8)
-   
+    const getPagesNumbers = (currentPage: number): number[] => {
+        const [pagesLeft, pagesRight] = getDefaultPagesLeftAndRight(pagerSize)
+        const pagesToAddRight = currentPage - pagesLeft - 1 < 0 ? (currentPage - pagesLeft - 1) * -1 : 0;
+        const pagesToAddLeft = totalPages - currentPage - pagesRight < 0 ? (totalPages - currentPage - pagesRight) * -1 : 0;
 
-    */
+        const firstPageLeftIndex = currentPage - pagesLeft - pagesToAddLeft;
+        const lastPageRightIndex = currentPage + pagesRight + pagesToAddRight
+
+        const pagesNumber: number[] = []
+        let pagesAdded = 0;
+        for (let i: number = firstPageLeftIndex; i <= lastPageRightIndex; i++) {
+            if (i < 1 || i > totalPages) continue;
+            if (pagesAdded == pagerSize) break;
+            
+            pagesNumber.push(i)
+            pagesAdded++
+        }
+        
+        return pagesNumber
+    }
+
+    const pageNumbers = getPagesNumbers(currentPage);
 
     return (
         <div>
+            <button onClick={() => onPageChange(1)}>First</button>
             <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1}>
                 Previous
             </button>
-            <span>
-                Page {currentPage} of {totalPages}
-            </span>
+            {
+                pageNumbers.map(page =>  <button onClick={() => onPageChange(page)} key={page}>{page}</button>)
+            }
             <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages}>
                 Next
             </button>
+            <button onClick={() => onPageChange(totalPages)}>Last</button>
         </div>
     );
 }

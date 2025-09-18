@@ -2,6 +2,7 @@ import React from 'react';
 import { type Stories } from './api';
 import Check from './check.svg?react';
 import { type SortStatus } from './reducer';
+import { Pager} from './Pager'
 
 interface ItemListProps {
   url: string;
@@ -36,6 +37,9 @@ interface ListProps {
   list: Stories[];
   sortStatus: SortStatus[];
   showGetMoreResultsButton: boolean;
+  currentPage: number;
+  pagerSize: number;
+  totalPages: number;
   onRemoveClicked: (objectID: number) => void
   onEditClicked: (objectID: number) => void;
   onSort: (field: keyof Stories) => void;
@@ -45,6 +49,9 @@ export const List = React.memo(({
     list, 
     sortStatus,
     showGetMoreResultsButton, 
+    currentPage,
+    pagerSize,
+    totalPages,
     onRemoveClicked, 
     onEditClicked, 
     onSort,
@@ -63,7 +70,9 @@ export const List = React.memo(({
         {showGetMoreResultsButton ? (
             <div>
                 <button className='button' onClick={onGetMoreResultsClicked}>Get more results</button>
-            </div>) : null }
+                <Pager currentPage={currentPage} onPageChange={() => {}} pagerSize={pagerSize} totalPages={totalPages} />
+            </div>) : null 
+        }
         <ul>
             <li className='header'>
                 <span style={{ width: '40%' }}><p onClick={() => onSort('title')}>{`Title ${getColumnHeader('title')}`}</p></span>
