@@ -2,7 +2,6 @@ import React from 'react';
 import { type Stories } from './api';
 import Check from './check.svg?react';
 import { type SortStatus } from './reducer';
-import { Pager} from './Pager'
 
 interface ItemListProps {
   url: string;
@@ -36,26 +35,17 @@ export const ItemList = ({ url, title, author, num_comments, points, onRemoveCli
 interface ListProps {
   list: Stories[];
   sortStatus: SortStatus[];
-  showGetMoreResultsButton: boolean;
-  currentPage: number;
-  pagerSize: number;
-  totalPages: number;
   onRemoveClicked: (objectID: number) => void
   onEditClicked: (objectID: number) => void;
   onSort: (field: keyof Stories) => void;
-  onGetMoreResultsClicked: () => void;
 }
 export const List = React.memo(({ 
     list, 
     sortStatus,
-    showGetMoreResultsButton, 
-    currentPage,
-    pagerSize,
-    totalPages,
     onRemoveClicked, 
     onEditClicked, 
     onSort,
-    onGetMoreResultsClicked }: ListProps) => {
+ }: ListProps) => {
   // rest operator on the left, {objectID,...item}, destructure objectID current element in the list, 
   //   assigning the rest of the properties to a new object, 'item'.
   // spread operator on the right, ...item, creates key=value pairs for each operator in item object
@@ -66,31 +56,23 @@ export const List = React.memo(({
   }
 
   return (
-    <>
-        {showGetMoreResultsButton ? (
-            <div>
-                <button className='button' onClick={onGetMoreResultsClicked}>Get more results</button>
-                <Pager currentPage={currentPage} onPageChange={() => {}} pagerSize={pagerSize} totalPages={totalPages} />
-            </div>) : null 
-        }
-        <ul>
-            <li className='header'>
-                <span style={{ width: '40%' }}><p onClick={() => onSort('title')}>{`Title ${getColumnHeader('title')}`}</p></span>
-                <span style={{ width: '23%' }}><p onClick={() => onSort('author')}>{`Authors ${getColumnHeader('author')}`}</p></span>
-                <span style={{ width: '15%' }}><p onClick={() => onSort('num_comments')}>{`Number of comments ${getColumnHeader('num_comments')}`}</p></span>
-                <span style={{ width: '12%' }}><p onClick={() => onSort('points')}>{`Points ${getColumnHeader('points')}`}</p></span>
-                <span style={{ width: '10%' }} />
-                <br />
-                <br />
-            </li>
-            {list.map(({ objectID, ...item }) => (
-                <ItemList
-                onRemoveClicked={() => onRemoveClicked(objectID)}
-                onEditClicked={() => onEditClicked(objectID)}
-                {...item}
-                />
-            ))}
-        </ul>
-    </>
+    <ul>
+        <li className='header'>
+            <span style={{ width: '40%' }}><p onClick={() => onSort('title')}>{`Title ${getColumnHeader('title')}`}</p></span>
+            <span style={{ width: '23%' }}><p onClick={() => onSort('author')}>{`Authors ${getColumnHeader('author')}`}</p></span>
+            <span style={{ width: '15%' }}><p onClick={() => onSort('num_comments')}>{`Number of comments ${getColumnHeader('num_comments')}`}</p></span>
+            <span style={{ width: '12%' }}><p onClick={() => onSort('points')}>{`Points ${getColumnHeader('points')}`}</p></span>
+            <span style={{ width: '10%' }} />
+            <br />
+            <br />
+        </li>
+        {list.map(({ objectID, ...item }) => (
+            <ItemList
+            onRemoveClicked={() => onRemoveClicked(objectID)}
+            onEditClicked={() => onEditClicked(objectID)}
+            {...item}
+            />
+        ))}
+    </ul>
   )
 })

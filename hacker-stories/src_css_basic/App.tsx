@@ -16,6 +16,8 @@ import { StoryForm } from './Form'
 import { storiesReducer } from './reducer';
 import { SimpleForm } from './SimpleForm'
 import { List } from './List';
+import { PagerOptions, type PagerOptionValues } from './PagerOptions'
+import { Pager} from './Pager'
 
 const searchKey = 'search';
 
@@ -52,6 +54,7 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useStorageState(searchKey, "React", isMounted)
   const [currentPageNumber, setCurrentPageNumber] = useState(0)
   const [currentPageTotal, setCurrentPageTotal] = useState(0)
+  const [pagerOption, setPagerOptions] = useState<PagerOptionValues>('Get More (manual)')
 
   const [triggerCount, setTriggerCount] = useState(0)
   const [usarApiFake, setUsarApiFake] = useState(false)
@@ -179,6 +182,7 @@ const App = () => {
         <button onClick={handleAddClicked}>Add Story</button>
         <input type='checkbox' checked={usarApiFake} onChange={(event) => setUsarApiFake(event.target.checked)} />
         <span>Usar API fake</span>
+        <PagerOptions selectedOption={pagerOption} onSelectOption={(value) => setPagerOptions(value)} />
       </div>
       <hr />
       {
@@ -189,18 +193,28 @@ const App = () => {
           </>) : null
       }
       {asyncMessage ? <p>{asyncMessage}</p>
-        : <List
-            list={stories}
-            onRemoveClicked={handleRemoveStory}
-            onEditClicked={handleEditClicked}
-            onSort={handleSort}
-            onGetMoreResultsClicked={handleGetMoreResultsClicked}
-            sortStatus={sortStatus}
-            showGetMoreResultsButton={showGetMoreResultsButton}
-            currentPage={currentPageNumber}
-            totalPages={currentPageTotal}
-            pagerSize={5}
-          />
+        : (
+            <>
+                <Pager
+                    moreManual={pagerOption === 'Get More (manual)' ? {
+                        onGetMoreResultsClicked: handleGetMoreResultsClicked
+                    } : undefined}
+                    clasico={ pagerOption === 'Clásico' ? {
+                        currentPage: currentPageNumber,
+                        onPageChange: () => {},
+                        pagerSize: 5,
+                        totalPages: currentPageTotal
+                    } : undefined}
+                />
+                <List
+                    list={stories}
+                    onRemoveClicked={handleRemoveStory}
+                    onEditClicked={handleEditClicked}
+                    onSort={handleSort}
+                    sortStatus={sortStatus}
+                />
+          </>
+        )
       }
     </div>
   )

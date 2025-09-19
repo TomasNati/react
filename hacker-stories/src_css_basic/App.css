@@ -105,3 +105,12 @@
     .search-terms-bar > button {
         margin: 5px;
     }
+
+.pager-options {
+    display: flex;
+    gap: 3px;
+    padding: 3px;
+}
+    .pager-options .button-selected {
+        font-weight: bold;
+    }

@@ -1,10 +1,22 @@
 interface PagerProps {
-    currentPage: number;
-    pagerSize: number;
-    totalPages: number;
-    onPageChange: (newPage: number) => void;
+    clasico?: {
+        currentPage: number,
+        pagerSize: number,
+        totalPages: number,
+        onPageChange: (newPage: number) => void,
+    },
+    moreManual?: {
+        onGetMoreResultsClicked: () => void;
+    }
 }
-export const Pager = ({ currentPage, pagerSize, totalPages, onPageChange }: PagerProps) => {
+export const Pager = ({ clasico, moreManual }: PagerProps) => {
+
+    const {
+        pagerSize = 5,
+        totalPages = 1,
+        currentPage = 1,
+        onPageChange = () => {}
+    } = clasico || {};
 
     const getDefaultPagesLeftAndRight = (pagerSize: number) => {
         const floor = Math.floor(pagerSize/2);
@@ -13,6 +25,9 @@ export const Pager = ({ currentPage, pagerSize, totalPages, onPageChange }: Page
     }
 
     const getPagesNumbers = (currentPage: number): number[] => {
+        if (!clasico) return []
+        
+
         const [pagesLeft, pagesRight] = getDefaultPagesLeftAndRight(pagerSize)
         const pagesToAddRight = currentPage - pagesLeft - 1 < 0 ? (currentPage - pagesLeft - 1) * -1 : 0;
         const pagesToAddLeft = totalPages - currentPage - pagesRight < 0 ? (totalPages - currentPage - pagesRight) * -1 : 0;
@@ -33,21 +48,29 @@ export const Pager = ({ currentPage, pagerSize, totalPages, onPageChange }: Page
         return pagesNumber
     }
 
-    const pageNumbers = getPagesNumbers(currentPage);
+    const pageNumbers = getPagesNumbers(clasico?.currentPage || 0);
 
     return (
-        <div>
-            <button onClick={() => onPageChange(1)}>First</button>
-            <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1}>
-                Previous
-            </button>
-            {
-                pageNumbers.map(page =>  <button onClick={() => onPageChange(page)} key={page}>{page}</button>)
+        <>
+            {moreManual ? (
+                <button className='button' onClick={moreManual.onGetMoreResultsClicked}>Get more results</button>
+            ): null }
+            {clasico ? (
+                <div>
+                    <button onClick={() => onPageChange(1)}>First</button>
+                    <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1}>
+                        Previous
+                    </button>
+                    {
+                        pageNumbers.map(page =>  <button onClick={() => onPageChange(page)} key={page}>{page}</button>)
+                    }
+                    <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+                        Next
+                    </button>
+                    <button onClick={() => onPageChange(totalPages)}>Last</button>
+                </div>): null
             }
-            <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-                Next
-            </button>
-            <button onClick={() => onPageChange(totalPages)}>Last</button>
-        </div>
+        </>
+        
     );
 }
