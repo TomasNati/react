@@ -17,7 +17,7 @@ import { storiesReducer } from './reducer';
 import { SimpleForm } from './SimpleForm'
 import { List } from './List';
 import { PagerOptions, type PagerOptionValues } from './PagerOptions'
-import { Pager} from './Pager'
+import { Pager } from './Pager'
 
 const searchKey = 'search';
 
@@ -155,13 +155,12 @@ const App = () => {
     setTriggerCount((count: number) => count + 1)
   }, []);
 
-  const handleGetMoreResultsClicked = () => {   
-    setCurrentPageNumber(currentPageNumber + 1)
+  const handleGetNewPage = (page: number) => {
+    setCurrentPageNumber(page)
     setTriggerCount((count: number) => count + 1)
   }
 
   const sumComments = useMemo(() => getSumComments(stories), [stories]);
-  const showGetMoreResultsButton = currentPageNumber < currentPageTotal + 1
 
   const handleSort = (field: keyof Stories) => {
     dispatchStories({ type: 'SORT', payload: field })
@@ -194,25 +193,25 @@ const App = () => {
       }
       {asyncMessage ? <p>{asyncMessage}</p>
         : (
-            <>
-                <Pager
-                    moreManual={pagerOption === 'Get More (manual)' ? {
-                        onGetMoreResultsClicked: handleGetMoreResultsClicked
-                    } : undefined}
-                    clasico={ pagerOption === 'Clásico' ? {
-                        currentPage: currentPageNumber,
-                        onPageChange: () => {},
-                        pagerSize: 5,
-                        totalPages: currentPageTotal
-                    } : undefined}
-                />
-                <List
-                    list={stories}
-                    onRemoveClicked={handleRemoveStory}
-                    onEditClicked={handleEditClicked}
-                    onSort={handleSort}
-                    sortStatus={sortStatus}
-                />
+          <>
+            <Pager
+              currentPage={currentPageNumber}
+              totalPages={currentPageTotal}
+              moreManual={pagerOption === 'Get More (manual)' ? {
+                onGetMoreResultsClicked: () => handleGetNewPage(currentPageNumber + 1)
+              } : undefined}
+              clasico={pagerOption === 'Clásico' ? {
+                onPageChange: (page: number) => handleGetNewPage(page - 1),
+                pagerSize: 5,
+              } : undefined}
+            />
+            <List
+              list={stories}
+              onRemoveClicked={handleRemoveStory}
+              onEditClicked={handleEditClicked}
+              onSort={handleSort}
+              sortStatus={sortStatus}
+            />
           </>
         )
       }

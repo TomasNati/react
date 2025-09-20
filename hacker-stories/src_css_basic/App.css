@@ -50,6 +50,10 @@
     transition: all 0.1s ease-in;
 }
 
+    .button.button-selected {
+        font-weight: bold;
+    }
+
     .button:hover {
         background: #171212;
         color: #ffffff;
@@ -106,11 +110,9 @@
         margin: 5px;
     }
 
-.pager-options {
+.pager-options,
+.pager {
     display: flex;
     gap: 3px;
     padding: 3px;
 }
-    .pager-options .button-selected {
-        font-weight: bold;
-    }
