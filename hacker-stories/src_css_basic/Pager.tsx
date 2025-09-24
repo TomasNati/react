@@ -46,7 +46,8 @@ export const Pager = ({ currentPage, totalPages, clasico, moreManual }: PagerPro
         return pagesNumber
     }
 
-    const pageNumbers = getPagesNumbers(currentPage);
+    const classicPageNumber = currentPage + 1;
+    const pageNumbers = getPagesNumbers(classicPageNumber);
     const showGetMoreResultsButton = currentPage < totalPages + 1
 
     return (
@@ -57,7 +58,7 @@ export const Pager = ({ currentPage, totalPages, clasico, moreManual }: PagerPro
             {clasico ? (
                 <div className="pager">
                     <button className="button button_small" onClick={() => onPageChange(1)}>First</button>
-                    <button className="button button_small" onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1}>
+                    <button className="button button_small" onClick={() => onPageChange(classicPageNumber - 1)} disabled={classicPageNumber === 1}>
                         Previous
                     </button>
                     {
@@ -70,7 +71,7 @@ export const Pager = ({ currentPage, totalPages, clasico, moreManual }: PagerPro
                             </button>)
                         )
                     }
-                    <button className="button button_small" onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+                    <button className="button button_small" onClick={() => onPageChange(classicPageNumber + 1)} disabled={classicPageNumber === totalPages}>
                         Next
                     </button>
                     <button className="button button_small" onClick={() => onPageChange(totalPages)}>Last</button>

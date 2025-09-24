@@ -81,7 +81,11 @@ const App = () => {
       dispatchStories({ type: 'FETCH_STORIES_START', payload: 'Loading data...' })
       const result = usarApiFake ? await fakeGetAsyncStories() : await getAsyncStories(searchTerm, currentPageNumber)
       setCurrentPageTotal(result.totalPages)
-      dispatchStories({ type: 'FETCH_STORIES_COMPLETE', payload: result })
+      dispatchStories({ type: 'FETCH_STORIES_COMPLETE', payload: {
+        data: result.data,
+        page: result.page,
+        pagerType: pagerOption
+      } })
     } catch (error: unknown) {
       console.error('Error fetching stories:', error)
       dispatchStories({ type: 'SET_ERROR', payload: 'There was an error fetching the stories' })

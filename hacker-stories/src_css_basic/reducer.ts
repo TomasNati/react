@@ -1,4 +1,5 @@
-import type { Stories, StoriesUI } from "./api";
+import type { Stories} from "./api";
+import { type PagerOptionValues } from "./PagerOptions";
 import { sortByKey } from './utils';
 
 type ACTION_TYPE =
@@ -26,6 +27,12 @@ export interface StoriesState {
     sortStatus: SortStatus[];
 }
 
+export interface FetchStoriesCompletePayload {
+    data: Stories[],
+    page: number,
+    pagerType: PagerOptionValues
+}
+
 export interface SortStatus {
     field: keyof Stories;
     ascending?: boolean
@@ -33,7 +40,7 @@ export interface SortStatus {
 
 interface ReducerAction {
     type: ACTION_TYPE;
-    payload: Stories[] | Stories | string | undefined | StoriesUI | number;
+    payload: Stories[] | Stories | string | undefined | FetchStoriesCompletePayload | number;
 }
 
 const sortStories = (stories: Stories[], sortStatuses: SortStatus[]): Stories[] => {
@@ -56,8 +63,23 @@ export const storiesReducer = (state: StoriesState, action: ReducerAction): Stor
                 asyncMessage: action.payload as string,
             }
         case 'FETCH_STORIES_COMPLETE': {
-            const result = action.payload as StoriesUI
-            const newStories = result.page === 0 ? result.data : [...state.stories, ...result.data]
+            const {data, page, pagerType} = action.payload as FetchStoriesCompletePayload
+            let newStories: Stories[] = []
+            switch (pagerType) {
+                case "Clásico":
+                    newStories = data
+                    break;
+                case "Get More (automático)":
+                    newStories = [];
+                    break;
+                case "Get More (manual)": {
+                    newStories = page === 0 ? data : [...state.stories, ...data];
+                    break;
+                }
+                default:
+                    break;
+            }
+
             return {
                 ...state,
                 asyncMessage: '',
