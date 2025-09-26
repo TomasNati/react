@@ -172,32 +172,30 @@ const App = () => {
 
   return (
     <div className="app-container">
-      <h1>My Hacker Stories 2 with {sumComments} comments</h1>
+      <h1 className='header-item'>My Hacker Stories 2 with {sumComments} comments</h1>
       <SimpleForm
         handleTriggerSearch={handleTriggerSearch}
         handleSearchTermChanged={handleSearchTermChanged}
         searchTerm={searchTerm}
       />
-      <hr />
-      <div style={{
-        marginTop: '5px'
-      }}>
+      <hr className='header-item separator' />
+      <div className='header-item'>
         <button onClick={handleAddClicked}>Add Story</button>
         <input type='checkbox' checked={usarApiFake} onChange={(event) => setUsarApiFake(event.target.checked)} />
         <span>Usar API fake</span>
         <PagerOptions selectedOption={pagerOption} onSelectOption={(value) => setPagerOptions(value)} />
       </div>
-      <hr />
+      <hr className='header-item separator'/>
       {
         showForm ? (
-          <>
+          <div className='header-item'>
             <StoryForm initStory={storyToEdit} onStorySubmit={handleSubmitForm} onCancel={handleCancelForm} />
             <hr />
-          </>) : null
+          </div>) : null
       }
       {asyncMessage ? <p>{asyncMessage}</p>
         : (
-          <>
+          <div className='app-container-remaining'>
             <Pager
               currentPage={currentPageNumber}
               totalPages={currentPageTotal}
@@ -216,7 +214,7 @@ const App = () => {
               onSort={handleSort}
               sortStatus={sortStatus}
             />
-          </>
+          </div>
         )
       }
     </div>
