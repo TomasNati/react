@@ -18,6 +18,7 @@ import { SimpleForm } from './SimpleForm'
 import { List } from './List';
 import { PagerOptions, type PagerOptionValues } from './PagerOptions'
 import { Pager } from './Pager'
+import { ScrollEndDetector } from './ScrollEndDetector'
 
 const searchKey = 'search';
 
@@ -74,6 +75,11 @@ const App = () => {
 
   const { stories, asyncMessage, storyToEdit, showForm, sortStatus } = storiesState
 
+  const onScrollEnd = () => {
+    if (currentPageNumber < currentPageTotal - 1) {
+      handleGetNewPage(currentPageNumber + 1)
+    }
+  }
 
   const fetchStories = useCallback(async () => {
     try {
@@ -81,11 +87,13 @@ const App = () => {
       dispatchStories({ type: 'FETCH_STORIES_START', payload: 'Loading data...' })
       const result = usarApiFake ? await fakeGetAsyncStories() : await getAsyncStories(searchTerm, currentPageNumber)
       setCurrentPageTotal(result.totalPages)
-      dispatchStories({ type: 'FETCH_STORIES_COMPLETE', payload: {
-        data: result.data,
-        page: result.page,
-        pagerType: pagerOption
-      } })
+      dispatchStories({
+        type: 'FETCH_STORIES_COMPLETE', payload: {
+          data: result.data,
+          page: result.page,
+          pagerType: pagerOption
+        }
+      })
     } catch (error: unknown) {
       console.error('Error fetching stories:', error)
       dispatchStories({ type: 'SET_ERROR', payload: 'There was an error fetching the stories' })
@@ -185,7 +193,7 @@ const App = () => {
         <span>Usar API fake</span>
         <PagerOptions selectedOption={pagerOption} onSelectOption={(value) => setPagerOptions(value)} />
       </div>
-      <hr className='header-item separator'/>
+      <hr className='header-item separator' />
       {
         showForm ? (
           <div className='header-item'>
@@ -195,7 +203,7 @@ const App = () => {
       }
       {asyncMessage ? <p>{asyncMessage}</p>
         : (
-          <div className='app-container-remaining'>
+          <ScrollEndDetector onScrollEnd={onScrollEnd}>
             <Pager
               currentPage={currentPageNumber}
               totalPages={currentPageTotal}
@@ -214,7 +222,7 @@ const App = () => {
               onSort={handleSort}
               sortStatus={sortStatus}
             />
-          </div>
+          </ScrollEndDetector>
         )
       }
     </div>
