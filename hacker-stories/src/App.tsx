@@ -6,7 +6,7 @@ import {
   useReducer,
   useCallback,
   useRef,
-  RefObject,
+  type RefObject,
   useMemo
 } from 'react'
 import './App.css'
