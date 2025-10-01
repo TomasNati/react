@@ -52,7 +52,7 @@ export const InputWithLabel = ({ id, value, type, onValueChanged, children, auto
     )
 }
 
-interface SimpleFormProps {
+export interface SimpleFormProps {
     handleTriggerSearch: () => void;
     handleSearchTermChanged: (newTerm: string) => void;
     searchTerm: string;

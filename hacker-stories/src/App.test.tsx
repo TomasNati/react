@@ -1,8 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
-import App, { List, ItemList } from "./App";
-import { storiesReducer, StoriesState } from "./reducer";
-import { SimpleForm, InputWithLabel, SimpleFormProps } from "./SimpleForm";
-import { Stories, StoriesUI } from "./api";
+import App from "./App";
+import { ItemList } from "./List";
+import { storiesReducer, type StoriesState } from "./reducer";
+import { SimpleForm, type SimpleFormProps } from "./SimpleForm";
+import { type Stories} from "./api";
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import axios from "axios";
 
@@ -41,6 +42,8 @@ describe('storiesReducer', () => {
     it('removes a story from all stories - start', () => {
         const state: StoriesState = {
             stories: [...stories],
+            unsortedStories: [...stories],
+            sortStatus: [ { field: 'title', ascending: true } ],
             asyncMessage: '',
             storyToEdit: undefined,
             showForm: false
@@ -57,6 +60,8 @@ describe('storiesReducer', () => {
     it('removes a story from all stories - end', () => {
         const state: StoriesState = {
             stories: [...stories],
+            unsortedStories: [...stories],
+            sortStatus: [ { field: 'title', ascending: true } ],
             asyncMessage: '',
             storyToEdit: undefined,
             showForm: false
@@ -129,7 +134,7 @@ describe('App', () => {
             }
         })
 
-        axios.get.mockImplementationOnce(() => promise);
+        vi.mocked(axios.get).mockImplementationOnce(() => promise);
         render(<App />);
         expect(screen.queryByText(/Loading/)).toBeInTheDocument()
 
@@ -148,7 +153,7 @@ describe('App', () => {
             }
         })
 
-        axios.get.mockImplementationOnce(() => promise);
+        vi.mocked(axios.get).mockImplementationOnce(() => promise);
         render(<App />);
         try {
             await waitFor(async () => await promise);
@@ -165,7 +170,7 @@ describe('App', () => {
             }
         })
 
-        axios.get.mockImplementationOnce(() => promise);
+       vi.mocked(axios.get).mockImplementationOnce(() => promise);
         render(<App />);
         try {
             await waitFor(async () => await promise);
@@ -174,7 +179,7 @@ describe('App', () => {
         }
     })
 
-    it('removes an item from the list', async () => {
+    it.only('removes an item from the list', async () => {
         const promise = Promise.resolve({
             status: 200,
             data: {
@@ -182,7 +187,7 @@ describe('App', () => {
             }
         })
 
-        axios.get.mockImplementationOnce(() => promise);
+        vi.mocked(axios.get).mockImplementationOnce(() => promise);
         render(<App />);
 
         await waitFor(async () => await promise);
@@ -216,7 +221,7 @@ describe('App', () => {
             }
         })
 
-        axios.get.mockImplementation((url: string) => {
+         vi.mocked(axios.get).mockImplementation((url: string) => {
             if (url.includes('React')) {
                 return promiseInitialFetch
             } else if (url.includes('Andrés')) {

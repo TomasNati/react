@@ -25,9 +25,9 @@ export const getAsyncStories = (): Promise<StoriesUI> => {
     return new Promise((resolve) => {
         setTimeout(() => {
             resolve({
-                data: {
-                    stories
-                }
+                data: stories,
+                page: 0,
+                totalPages: 1
             })
         }, 1200)
     })
@@ -41,7 +41,9 @@ export const deleteAsyncStories = (objectIDToDelete: number, currentStories: Sto
             } else {
                 const stories = currentStories.filter(({ objectID }) => objectID != objectIDToDelete)
                 resolve({
-                    data: stories
+                    data: stories,
+                    page: 0,
+                    totalPages: 1
                 })
             }
         }, 1000)
@@ -59,7 +61,9 @@ export const editAsyncStory = (story: Stories, currentStories: Stories[]): Promi
                     newStories.push(curStory.objectID == story.objectID ? story : curStory)
                 });
                 resolve({
-                    data: newStories
+                    data: newStories,
+                    page: 0,
+                    totalPages: 1
                 })
             }
         }, 1000)
@@ -73,7 +77,9 @@ export const addAsyncStory = (story: Stories, currentStories: Stories[]): Promis
                 reject(`Story with ID: ${story.objectID} is already present in the collection`)
             } else {
                 resolve({
-                    data: [...currentStories, story]
+                    data: [...currentStories, story],
+                    page: 0,
+                    totalPages: 1
                 })
             }
         }, 1000)
