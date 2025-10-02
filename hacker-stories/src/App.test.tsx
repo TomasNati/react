@@ -11,7 +11,7 @@ vi.mock('axios')
 
 const stories: Stories[] = [
     {
-        title: 'React',
+        title: 'React Home',
         url: 'http://reactjs.org/',
         author: 'Jordan Walke',
         num_comments: 3,
@@ -79,8 +79,8 @@ describe('storiesReducer', () => {
 describe('ItemList', () => {
     it('render all properties', () => {
         render(<ItemList {...stories[0]} onEditClicked={() => { }} onRemoveClicked={() => { }} />)
-        expect(screen.getByText('Authors: Jordan Walke')).toBeInTheDocument();
-        expect(screen.getByText('React')).toHaveAttribute('href', 'http://reactjs.org/')
+        expect(screen.getByText('Jordan Walke')).toBeInTheDocument();
+        expect(screen.getByText('React Home')).toHaveAttribute('href', 'http://reactjs.org/')
     });
 
     it('render clickable butons', () => {
@@ -140,7 +140,7 @@ describe('App', () => {
 
         await waitFor(async () => await promise);
         expect(screen.queryByText(/Loading/)).toBeNull();
-        expect(screen.queryByText('React')).toBeInTheDocument();
+        expect(screen.queryByText('React Home')).toBeInTheDocument();
         expect(screen.queryByText('Redux')).toBeInTheDocument();
         expect(screen.queryAllByText('Edit')).toHaveLength(2);
     })
@@ -179,7 +179,7 @@ describe('App', () => {
         }
     })
 
-    it.only('removes an item from the list', async () => {
+    it('removes an item from the list', async () => {
         const promise = Promise.resolve({
             status: 200,
             data: {
@@ -191,17 +191,19 @@ describe('App', () => {
         render(<App />);
 
         await waitFor(async () => await promise);
-        expect(screen.queryByText('React')).toBeInTheDocument();
+        expect(screen.queryByText('React Home')).toBeInTheDocument();
         const firstRemoveButton = screen.getAllByRole('button', { name: '' })[0]
         fireEvent.click(firstRemoveButton)
-        expect(screen.queryByText('React')).not.toBeInTheDocument();
+        expect(screen.queryByText('React Home')).not.toBeInTheDocument();
     })
 
-    it('searches again when clickingn submit button', async () => {
+    it('searches again when clicking submit button', async () => {
         const promiseInitialFetch = Promise.resolve({
             status: 200,
             data: {
-                hits: stories
+                hits: stories,
+                page: 0,
+                totalPages: 1
             }
         })
 
@@ -217,7 +219,9 @@ describe('App', () => {
         const promiseSecondFetch = Promise.resolve({
             status: 200,
             data: {
-                hits: [newStory]
+                hits: [newStory],
+                page: 0,
+                totalPages: 1
             }
         })
 
@@ -232,7 +236,7 @@ describe('App', () => {
         render(<App />);
 
         await waitFor(async () => await promiseInitialFetch);
-        expect(screen.queryByText('React')).toBeInTheDocument();
+        expect(screen.queryByText('React Home')).toBeInTheDocument();
         expect(screen.queryByText('Redux')).toBeInTheDocument();
         expect(screen.queryByText(/Pruebas/)).toBeNull();
 
@@ -243,7 +247,7 @@ describe('App', () => {
 
         fireEvent.click(screen.getByRole('button', { name: 'Search' }))
         await waitFor(async () => await promiseSecondFetch);
-        expect(screen.queryByText('React')).toBeNull();
+        expect(screen.queryByText('React Home')).toBeNull();
         expect(screen.queryByText('Redux')).toBeNull();
         expect(screen.queryByText(/Pruebas/)).toBeInTheDocument();
 
